@@ -37,7 +37,7 @@ Solution["lambda_list"] = []
 Solution["Q_list"] = []
 Solution["result_list"] = []
 
-for W in 1:14
+for W in 3:6
 
     support_jacobian, min_support = SP_4_Cohomology.symplectic_min_supports(quotient_hom_Steinberg, S)
 
@@ -96,4 +96,4 @@ for W in 1:14
 
 end
 
-serialize("./Steinberg_Solution_Sp_4_list_15_10_2024.sjl", Solution)
+# serialize("./Steinberg_Solution_Sp_4_list_15_10_2024.sjl", Solution)
