@@ -19,6 +19,10 @@ function relations_St(
     z(i) = gen_dict[MatrixGroups.ElementarySymplectic{2*N}(:B,i,i + N)]
     zt(i) = gen_dict[MatrixGroups.ElementarySymplectic{2*N}(:B,i + N,i)]
 
+    relations_mono = vcat(
+        [z(i)*zt(i)^(-1)*z(i)*z(i)*zt(i)^(-1)*z(i)*z(i)*zt(i)^(-1)*z(i)*z(i)*zt(i)^(-1)*z(i) for i in 1:N]
+    )
+
     relations_adj = vcat(
         [com(x(i,j),x(j,k))*x(i,k)^(-1) for (i,j,k) in triples],
         [com(x(i,j),y(j,k))*y(i,k)^(-1) for (i,j,k) in triples],
@@ -54,84 +58,141 @@ function relations_St(
         ]
     relations_sq = vcat([relations_sq[k] for k in 1:length(relations_sq) if !(k in W)]...)
 
-    pair_commutators = []
+    sq_commutators = []
     for i in 1:N
         for j in 1:N
             if i != j
-                push!(pair_commutators, com(x(i,j), z(i)))
-                push!(pair_commutators, com(x(i,j), zt(j)))
+                push!(sq_commutators, com(x(i,j), z(i)))
+                push!(sq_commutators, com(z(i), x(i,j)))
 
-                push!(pair_commutators, com(y(i,j), z(j)))
-                push!(pair_commutators, com(yt(i,j), zt(j)))
+                push!(sq_commutators, com(x(i,j), zt(j)))
+                push!(sq_commutators, com(zt(j), x(i,j)))
 
-                push!(pair_commutators, com(y(i,j), z(i)))
-                push!(pair_commutators, com(yt(i,j), zt(i)))
+
+                push!(sq_commutators, com(y(i,j), z(j)))
+                push!(sq_commutators, com(z(j), y(i,j)))
+
+                push!(sq_commutators, com(yt(i,j), zt(j)))
+                push!(sq_commutators, com(zt(j), yt(i,j)))
+
+
+                push!(sq_commutators, com(y(i,j), z(i)))
+                push!(sq_commutators, com(z(i), y(i,j)))
+
+                push!(sq_commutators, com(yt(i,j), zt(i)))
+                push!(sq_commutators, com(zt(i), yt(i,j)))
             end
         end
     end
 
-    triplet_commutators = []
+    adj_commutators = []
     for i in 1:N
         for j in 1:N
             for k in 1:N
                 if i != j && j != k && i != k
-                    push!(triplet_commutators, com(x(i,j), x(i,k)))
-                    push!(triplet_commutators, com(x(i,j), x(k,j)))
+                    push!(adj_commutators, com(x(i,j), x(i,k)))
+                    push!(adj_commutators, com(x(i,j), x(k,j)))
 
-                    push!(triplet_commutators, com(x(i,j), y(i,k)))
+                    push!(adj_commutators, com(x(i,j), y(i,k)))
+                    push!(adj_commutators, com(y(i,k), x(i,j)))
 
-                    push!(triplet_commutators, com(x(i,j), yt(k,j)))
+                    push!(adj_commutators, com(x(i,j), yt(k,j)))
+                    push!(adj_commutators, com(yt(k,j), x(i,j)))
 
-                    push!(triplet_commutators, com(y(i,j), y(j,k)))
-                    push!(triplet_commutators, com(y(i,j), y(i,k)))
-                    push!(triplet_commutators, com(y(i,j), y(k,j)))
+                    push!(adj_commutators, com(y(i,j), y(j,k)))
+                    push!(adj_commutators, com(y(i,j), y(i,k)))
+                    push!(adj_commutators, com(y(i,j), y(k,j)))
 
-                    push!(triplet_commutators, com(yt(i,j), yt(j,k)))
-                    push!(triplet_commutators, com(yt(i,j), yt(j,k)))
-                    push!(triplet_commutators, com(yt(i,j), yt(j,k)))
+                    push!(adj_commutators, com(yt(i,j), yt(j,k)))
+                    push!(adj_commutators, com(yt(i,j), yt(j,k)))
+                    push!(adj_commutators, com(yt(i,j), yt(j,k)))
 
-                    push!(triplet_commutators, com(z(i), y(j,k)))
-                    push!(triplet_commutators, com(z(i), yt(j,k)))
-                    push!(triplet_commutators, com(z(i), x(j,k)))
+                    push!(adj_commutators, com(z(i), y(j,k)))
+                    push!(adj_commutators, com(y(j,k), z(i)))
+                    push!(adj_commutators, com(z(i), yt(j,k)))
+                    push!(adj_commutators, com(yt(j,k), z(i)))
+                    push!(adj_commutators, com(z(i), x(j,k)))
+                    push!(adj_commutators, com(x(j,k), z(i)))
 
-                    push!(triplet_commutators, com(zt(i), y(j,k)))
-                    push!(triplet_commutators, com(zt(i), yt(j,k)))
-                    push!(triplet_commutators, com(zt(i), x(j,k)))
+                    push!(adj_commutators, com(zt(i), y(j,k)))
+                    push!(adj_commutators, com(y(j,k), zt(i)))
+                    push!(adj_commutators, com(zt(i), yt(j,k)))
+                    push!(adj_commutators, com(yt(j,k), zt(i)))
+                    push!(adj_commutators, com(zt(i), x(j,k)))
+                    push!(adj_commutators, com(x(j,k), zt(i)))
+
                 end
             end
         end
     end
 
-    quad_commutators = []
+    op_commutators = []
     for i in 1:N
         for j in 1:N
             for k in 1:N
                 for l in 1:N
                     if i != j && j != k && k != l && i != k && i != l && j != l
-                        push!(quad_commutators, com(x(i,j), x(k,l)))
+                        push!(op_commutators, com(x(i,j), x(k,l)))
 
-                        push!(quad_commutators, com(x(i,j), y(k,l)))
-                        push!(quad_commutators, com(x(i,j), yt(k,l)))
+                        push!(op_commutators, com(x(i,j), y(k,l)))
+                        push!(op_commutators, com(y(k,l), x(i,j)))
 
-                        push!(quad_commutators, com(y(i,j), y(k,l)))
+                        push!(op_commutators, com(x(i,j), yt(k,l)))
+                        push!(op_commutators, com(yt(k,l), x(i,j)))
 
-                        push!(quad_commutators, com(y(i,j), yt(k,l)))
-                        
-                        push!(quad_commutators, com(yt(i,j), yt(k,l)))
+                        push!(op_commutators, com(y(i,j), y(k,l)))
+
+                        push!(op_commutators, com(y(i,j), yt(k,l)))
+                        push!(op_commutators, com(yt(k,l), y(i,j)))
+
+                        push!(op_commutators, com(yt(i,j), yt(k,l)))
                     end
                 end
             end
         end
     end
 
-    commutators = vcat(pair_commutators, triplet_commutators, quad_commutators)
+    z_commutators = sq_commutators
+    for i in 1:N
+        for j in 1:N
+            for k in 1:N
+                if i != j && j != k && i != k
+                    push!(z_commutators, com(z(i), y(j,k)))
+                    push!(z_commutators, com(y(j,k), z(i)))
+                    push!(z_commutators, com(z(i), yt(j,k)))
+                    push!(z_commutators, com(yt(j,k), z(i)))
+                    push!(z_commutators, com(z(i), x(j,k)))
+                    push!(z_commutators, com(x(j,k), z(i)))
 
+                    push!(z_commutators, com(zt(i), y(j,k)))
+                    push!(z_commutators, com(y(j,k), zt(i)))
+                    push!(z_commutators, com(zt(i), yt(j,k)))
+                    push!(z_commutators, com(yt(j,k), zt(i)))
+                    push!(z_commutators, com(zt(i), x(j,k)))
+                    push!(z_commutators, com(x(j,k), zt(i)))
 
-    if sq_adj_ == "sq" 
+                end
+            end
+        end
+    end
+
+    relations_sq = vcat(relations_sq, sq_commutators)
+    relations_adj = vcat(relations_adj, adj_commutators)
+    relations_op = vcat(op_commutators)
+
+    if sq_adj_ == "mono" 
+        return relations_mono
+    elseif sq_adj_ == "sq" 
         return relations_sq
     elseif sq_adj_ == "adj"
         return relations_adj
+    elseif sq_adj_ == "op"
+        return relations_op
+    elseif sq_adj_ == "op_comm"
+        return vcat(relations_op, z_commutators, relations_mono)
+    elseif sq_adj_ == "adj_comm"
+        return vcat(relations_adj, relations_sq, relations_op)
     elseif sq_adj_ == "all"
-        return vcat(relations_sq, relations_adj, commutators)
+        return vcat(relations_mono, relations_sq, relations_adj, relations_op)
     end
 end
