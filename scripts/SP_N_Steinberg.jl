@@ -15,25 +15,50 @@ using SP_4_Cohomology
 using SparseArrays
 using SymbolicWedderburn
 
-N = 3
+function extended_f_sp_2n(n::Integer)
+    Sp_N = MatrixGroups.SymplecticGroup{2*N}(Int8)
+    F_Sp_N_Steinberg = FreeGroup(alphabet(Sp_N))
 
-Sp_N = MatrixGroups.SymplecticGroup{2*N}(Int8)
+    gen_dict = Dict(LowCohomologySOS.determine_letter(S[i]) => gens(F_Sp_N_Steinberg, i) for i in eachindex(S))
+    
+    x(i,j) = gen_dict[MatrixGroups.ElementarySymplectic{2*N}(:A,i,j)]
+    y(i,j) = gen_dict[MatrixGroups.ElementarySymplectic{2*N}(:B,max(i,j),min(i,j) + N)]
+    yt(i,j) = gen_dict[MatrixGroups.ElementarySymplectic{2*N}(:B,min(i,j) + N,max(i,j))]
+    z(i,j) = gen_dict[MatrixGroups.ElementarySymplectic{2*N}(:B,i,i + N)]
+    zt(i,j) = gen_dict[MatrixGroups.ElementarySymplectic{2*N}(:B,i + N,i)]
+    
+    ordered_pairs = [(i,j) for i ∈ 1:N for j ∈ deleteat!(copy(range_as_list), findall(j->j==i,copy(range_as_list)))]
+    unordered_pairs = [(i,j) for i ∈ 1:N for j ∈ deleteat!(copy(range_as_list), findall(j->j<i,copy(range_as_list)))]
 
-F_2 = FreeGroup(2)
+    x_y_gens = vcat(
+        [x(i,j) for (i,j) in ordered_pairs],
+        [y(i,j) for (i,j) in unordered_pairs],
+        [yt(i,j) for (i,j) in unordered_pairs]               
+    )
+    z_gens = vcat(
+        [z(i,j) for (i,j) in unordered_pairs],
+        [zt(i,j) for (i,j) in unordered_pairs]               
+    )
 
-F_Sp_N_Steinberg = FreeGroup(alphabet(Sp_N))
+    x_y_gens_with_invs = vcat(x_y_gens, inv.(x_y_gens))
+    z_gens_with_invs = vcat(z_gens, inv.(z_gens))
 
-F_1 = FreeGroup(1)
+    x_y_alphabet_inverses = vcat([i+length(x_y_gens) for i in 1:length(x_y_gens)],[i for i in 1:length(x_y_gens)])
+    z_alphabet_inverses = vcat([i+length(z_gens) for i in 1:length(z_gens)],[i for i in 1:length(z_gens)])
 
-G = Groups.Constructions.DirectProduct(F_2,F_1)
-
-g = vcat(gens(G), inv.(gens(G)))
-
-#trzeba usunac pojedyncze z_i z generatorow G i wszystko zawrzec w drugim skladniku
-
-Alphabet(g, [4,5,6,1,2,3])
-
-F = FreeGroup(Alphabet(g, [4,5,6,1,2,3]))
+    F_x_y = FreeGroup(Alphabet(x_y_gens_with_invs, x_y_alphabet_inverses))
+    F_z = FreeGroup(Alphabet(z_gens_with_invs, z_alphabet_inverses))
+    
+    G = Groups.Constructions.DirectProduct(F_x_y,F_z)
+    
+    all_gens_with_invs = vcat(gens(G), inv.(gens(G)))
+    all_gens_number = div(length(all_gens_with_invs),2)
+    #trzeba usunac pojedyncze z_i z generatorow G i wszystko zawrzec w drugim skladniku
+    
+    whole_alphabet = Alphabet(all_gens_with_invs, vcat([i+all_gens_numbe for i in 1:all_gens_numbe],[i for i in 1:all_gens_numbe]))
+    
+    return FreeGroup(whole_alphabet)
+end
 
 G = Groups.Constructions.DirectProduct(F_Sp_N_Steinberg, F_2)
 
@@ -54,9 +79,13 @@ Solution["Q_list"] = []
 Solution["result_list"] = []
 
 
-support_jacobian, min_support = SP_4_Cohomology.symplectic_min_supports(quotient_hom_Steinberg, S; rels = "adj")
+# support_jacobian, min_support = SP_4_Cohomology.symplectic_min_supports(quotient_hom_Steinberg, S; rels = "adj")
 
-Steinberg_relations = SP_4_Cohomology.relations_St(F_Sp_N_Steinberg, S, N; sq_adj_ = "adj")
+# Steinberg_relations = SP_4_Cohomology.relations_St(F_Sp_N_Steinberg, S, N; sq_adj_ = "adj")
+
+support_jacobian, min_support = SP_4_Cohomology.symplectic_min_supports(quotient_hom_Steinberg, S)
+
+Steinberg_relations = SP_4_Cohomology.relations_St(F_Sp_N_Steinberg, S, N)
 
 for r in Steinberg_relations
     @assert quotient_hom_Steinberg(r) == one(Sp_N)
@@ -68,12 +97,15 @@ end
 
 I_N_mono, I_N_sq = SP_4_Cohomology.mono_sq_adj_op(I_N, S)
 
-Δ = Δm_adj_db + Δ₁⁺
+# Δ = Δm_adj_db + Δ₁⁺
+Δ = Δm_sq+ Δm_adj_mi+ Δm_adj_db+ Δm_op + Δ₁⁺
+Δ = Δ₁
 
 RG = LowCohomologySOS.group_ring(Sp_N, min_support, star_multiplication = true)
 
 Δ = LowCohomologySOS.embed.(identity, Δ, Ref(RG))
-I_N = LowCohomologySOS.embed.(identity, I_N_sq, Ref(RG))
+# I_N = LowCohomologySOS.embed.(identity, I_N_sq, Ref(RG))
+I_N = LowCohomologySOS.embed.(identity, I_N, Ref(RG))
 
 constraints_basis, psd_basis, Σ, action = SP_4_Cohomology.wedderburn_data(RG.basis, min_support, S);
 
@@ -98,7 +130,7 @@ end
 end
 
 # Find a numerical spectral gap
-JuMP.set_optimizer(sos_problem, SP_4_Cohomology.scs_opt(eps = 1e-6, max_iters = 1000))
+JuMP.set_optimizer(sos_problem, SP_4_Cohomology.scs_opt(eps = 1e-6, max_iters = 500))
 JuMP.optimize!(sos_problem)
 
 # Certify the numerical estimate
