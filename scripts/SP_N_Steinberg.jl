@@ -16,49 +16,46 @@ using SparseArrays
 using SymbolicWedderburn
 
 function extended_f_sp_2n(n::Integer)
-    Sp_N = MatrixGroups.SymplecticGroup{2*N}(Int8)
+    Sp_N = MatrixGroups.SymplecticGroup{2*n}(Int8)
     F_Sp_N_Steinberg = FreeGroup(alphabet(Sp_N))
+    S = gens(Sp_N)
 
     gen_dict = Dict(LowCohomologySOS.determine_letter(S[i]) => gens(F_Sp_N_Steinberg, i) for i in eachindex(S))
     
-    x(i,j) = gen_dict[MatrixGroups.ElementarySymplectic{2*N}(:A,i,j)]
-    y(i,j) = gen_dict[MatrixGroups.ElementarySymplectic{2*N}(:B,max(i,j),min(i,j) + N)]
-    yt(i,j) = gen_dict[MatrixGroups.ElementarySymplectic{2*N}(:B,min(i,j) + N,max(i,j))]
-    z(i,j) = gen_dict[MatrixGroups.ElementarySymplectic{2*N}(:B,i,i + N)]
-    zt(i,j) = gen_dict[MatrixGroups.ElementarySymplectic{2*N}(:B,i + N,i)]
+    x(i,j) = gen_dict[MatrixGroups.ElementarySymplectic{2*n}(:A,i,j)]
+    y(i,j) = gen_dict[MatrixGroups.ElementarySymplectic{2*n}(:B,max(i,j),min(i,j) + n)]
+    yt(i,j) = gen_dict[MatrixGroups.ElementarySymplectic{2*n}(:B,min(i,j) + n,max(i,j))]
     
-    ordered_pairs = [(i,j) for i ∈ 1:N for j ∈ deleteat!(copy(range_as_list), findall(j->j==i,copy(range_as_list)))]
-    unordered_pairs = [(i,j) for i ∈ 1:N for j ∈ deleteat!(copy(range_as_list), findall(j->j<i,copy(range_as_list)))]
+    range_as_list = [i for i in 1:n]
+    ordered_pairs = [(i,j) for i ∈ 1:n for j ∈ deleteat!(copy(range_as_list), findall(j->j==i,copy(range_as_list)))]
+    unordered_pairs = [(i,j) for i ∈ 1:n for j ∈ deleteat!(copy(range_as_list), findall(j->j<i,copy(range_as_list)))]
 
     x_y_gens = vcat(
         [x(i,j) for (i,j) in ordered_pairs],
         [y(i,j) for (i,j) in unordered_pairs],
         [yt(i,j) for (i,j) in unordered_pairs]               
     )
-    z_gens = vcat(
-        [z(i,j) for (i,j) in unordered_pairs],
-        [zt(i,j) for (i,j) in unordered_pairs]               
-    )
 
     x_y_gens_with_invs = vcat(x_y_gens, inv.(x_y_gens))
-    z_gens_with_invs = vcat(z_gens, inv.(z_gens))
 
     x_y_alphabet_inverses = vcat([i+length(x_y_gens) for i in 1:length(x_y_gens)],[i for i in 1:length(x_y_gens)])
-    z_alphabet_inverses = vcat([i+length(z_gens) for i in 1:length(z_gens)],[i for i in 1:length(z_gens)])
 
     F_x_y = FreeGroup(Alphabet(x_y_gens_with_invs, x_y_alphabet_inverses))
-    F_z = FreeGroup(Alphabet(z_gens_with_invs, z_alphabet_inverses))
+    F_z = FreeGroup(div(n*(n-1),2))
     
     G = Groups.Constructions.DirectProduct(F_x_y,F_z)
     
     all_gens_with_invs = vcat(gens(G), inv.(gens(G)))
     all_gens_number = div(length(all_gens_with_invs),2)
-    #trzeba usunac pojedyncze z_i z generatorow G i wszystko zawrzec w drugim skladniku
     
-    whole_alphabet = Alphabet(all_gens_with_invs, vcat([i+all_gens_numbe for i in 1:all_gens_numbe],[i for i in 1:all_gens_numbe]))
+    whole_alphabet = Alphabet(all_gens_with_invs, vcat([i+all_gens_number for i in 1:all_gens_number],[i for i in 1:all_gens_number]))
     
     return FreeGroup(whole_alphabet)
 end
+
+n = 3
+
+Extended_f_sp_2n = extended_f_sp_2n(n)
 
 G = Groups.Constructions.DirectProduct(F_Sp_N_Steinberg, F_2)
 
