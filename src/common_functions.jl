@@ -83,45 +83,54 @@ function symplectic_min_supports(
 
 end
 
-function mono_sq_adj_op(
+function sq_adj_op(
     Δ₁⁻,
-    S # generating set indexing Δ₁⁻
+    S # gens of Sp_N without z
 )
     RG = parent(first(Δ₁⁻))
     Sp2N = parent(first(RG.basis))
     N = Int8(sqrt(length(gens(Sp2N))/2))
-    mono_pairs = []
+
     sq_pairs = []
-    adj_mi_pairs = []
-    adj_db_pairs = []
+    adj_pairs = []
     op_pairs = []
+
+    M = length(S)
     A = alphabet(Sp2N)
-    for s in eachindex(S)
-        for t in eachindex(S)
-            s_i, s_j = mod(A[word(S[s])[1]].i,N), mod(A[word(S[s])[1]].j,N)
-            t_i, t_j = mod(A[word(S[t])[1]].i,N), mod(A[word(S[t])[1]].j,N)
+    
+    function index_pair(s::Int)
+        if s <= M
+            s_i, s_j = mod(A[word(S[s])[1]].i, N), mod(A[word(S[s])[1]].j, N)
+        elseif s <= Int(3*M/2)
+            s_i, s_j = Int(floor((s - 2*N^2 + 2*N) / (N-1))) + 1, mod(s - 1 - 2*N^2 + 2*N, N-1) + 1 + 
+                Int(Int(floor((s - 2*N^2 + 2*N) / (N-1))) + 1 <= mod(s - 1 - 2*N^2 + 2*N, N-1))
+        else
+            s_i, s_j = Int(floor((s - 3*N^2 + 3*N) / (N-1))) + 1, mod(s - 1 - 3*N^2 + 3*N, N-1) + 1 +
+                Int(Int(floor((s - 3*N^2 + 3*N) / (N-1))) + 1 <= mod(s - 1 - 3*N^2 + 3*N, N-1) )
+        end
+        return s_i, s_j
+    end
+    # needs to be checked
+
+    for s in 1:2*M
+        for t in 1:2*M
+            s_i, s_j = index_pair(s)
+            t_i, t_j = index_pair(t)
             if sort([s_i,s_j]) == sort([t_i, t_j])
-                if s_i == s_j
-                    push!(mono_pairs,(s,t))
-                else
-                    push!(sq_pairs,(s,t))
-                end
+                push!(sq_pairs,(s,t))
             elseif length(intersect!([s_i,s_j],[t_i,t_j])) == 1
-                push!(adj_db_pairs,(s,t))
-            elseif s_i == s_j || t_i == t_j
-                push!(adj_mi_pairs,(s,t))
+                push!(adj_pairs,(s,t))
             else
                 push!(op_pairs,(s,t))
             end
         end
     end
-    mono = [(i,j) in mono_pairs ? Δ₁⁻[i,j] : zero(RG) for i in eachindex(S), j in eachindex(S)]
-    sq = [(i,j) in sq_pairs ? Δ₁⁻[i,j] : zero(RG) for i in eachindex(S), j in eachindex(S)]
-    adj_mi = [(i,j) in adj_mi_pairs ? Δ₁⁻[i,j] : zero(RG) for i in eachindex(S), j in eachindex(S)]
-    adj_db = [(i,j) in adj_db_pairs ? Δ₁⁻[i,j] : zero(RG) for i in eachindex(S), j in eachindex(S)]
-    op = [(i,j) in op_pairs ? Δ₁⁻[i,j] : zero(RG) for i in eachindex(S), j in eachindex(S)]
 
-    @assert mono+sq+adj_mi+adj_db+op == Δ₁⁻
+    sq = [(i,j) in sq_pairs ? Δ₁⁻[i,j] : zero(RG) for i in 1:2*M, j in 1:2*M]
+    adj = [(i,j) in adj_pairs ? Δ₁⁻[i,j] : zero(RG) for i in 1:2*M, j in 1:2*M]
+    op = [(i,j) in op_pairs ? Δ₁⁻[i,j] : zero(RG) for i in 1:2*M, j in 1:2*M]
 
-    return mono, sq, adj_mi, adj_db, op
+    @assert sq+adj+op == Δ₁⁻
+
+    return sq, adj, op
 end
