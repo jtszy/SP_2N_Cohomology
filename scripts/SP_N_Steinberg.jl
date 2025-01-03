@@ -15,55 +15,69 @@ using SP_4_Cohomology
 using SparseArrays
 using SymbolicWedderburn
 
-function extended_f_sp_2n(n::Integer)
-    Sp_N = MatrixGroups.SymplecticGroup{2*n}(Int8)
-    F_Sp_N_Steinberg = FreeGroup(alphabet(Sp_N))
-    S = gens(Sp_N)
+n = 3
 
-    gen_dict = Dict(LowCohomologySOS.determine_letter(S[i]) => gens(F_Sp_N_Steinberg, i) for i in eachindex(S))
-    
-    x(i,j) = gen_dict[MatrixGroups.ElementarySymplectic{2*n}(:A,i,j)]
-    y(i,j) = gen_dict[MatrixGroups.ElementarySymplectic{2*n}(:B,max(i,j),min(i,j) + n)]
-    yt(i,j) = gen_dict[MatrixGroups.ElementarySymplectic{2*n}(:B,min(i,j) + n,max(i,j))]
-    
+Sp_N = MatrixGroups.SymplecticGroup{2*n}(Int8)
+F_Sp_N_Steinberg = FreeGroup(alphabet(Sp_N))
+
+function extended_f_sp_2n(n::Integer)
     range_as_list = [i for i in 1:n]
     ordered_pairs = [(i,j) for i ∈ 1:n for j ∈ deleteat!(copy(range_as_list), findall(j->j==i,copy(range_as_list)))]
     unordered_pairs = [(i,j) for i ∈ 1:n for j ∈ deleteat!(copy(range_as_list), findall(j->j<i,copy(range_as_list)))]
-
-    x_y_gens = vcat(
-        [x(i,j) for (i,j) in ordered_pairs],
-        [y(i,j) for (i,j) in unordered_pairs],
-        [yt(i,j) for (i,j) in unordered_pairs]               
+    
+    x_y_z_gens = vcat(
+        [(:x,i,j) for (i,j) in ordered_pairs],
+        [(:y,i,j) for (i,j) in unordered_pairs],
+        [(:yt,i,j) for (i,j) in unordered_pairs],
+        [(:z,i,j) for (i,j) in unordered_pairs],
+        [(:zt,i,j) for (i,j) in unordered_pairs],
+        [(:X,i,j) for (i,j) in ordered_pairs],
+        [(:Y,i,j) for (i,j) in unordered_pairs],
+        [(:Yt,i,j) for (i,j) in unordered_pairs],
+        [(:Z,i,j) for (i,j) in unordered_pairs],
+        [(:Zt,i,j) for (i,j) in unordered_pairs],
     )
 
-    x_y_gens_with_invs = vcat(x_y_gens, inv.(x_y_gens))
+    gens_number = div(length(x_y_z_gens),2)
+    alphabet = Alphabet(x_y_z_gens, vcat([i+gens_number for i in 1:gens_number],[i for i in 1:gens_number]))
 
-    x_y_alphabet_inverses = vcat([i+length(x_y_gens) for i in 1:length(x_y_gens)],[i for i in 1:length(x_y_gens)])
-
-    F_x_y = FreeGroup(Alphabet(x_y_gens_with_invs, x_y_alphabet_inverses))
-    F_z = FreeGroup(div(n*(n-1),2))
-    
-    G = Groups.Constructions.DirectProduct(F_x_y,F_z)
-    
-    all_gens_with_invs = vcat(gens(G), inv.(gens(G)))
-    all_gens_number = div(length(all_gens_with_invs),2)
-    
-    whole_alphabet = Alphabet(all_gens_with_invs, vcat([i+all_gens_number for i in 1:all_gens_number],[i for i in 1:all_gens_number]))
-    
-    return FreeGroup(whole_alphabet)
+    return FreeGroup(alphabet)
 end
-
-n = 3
 
 Extended_f_sp_2n = extended_f_sp_2n(n)
 
-G = Groups.Constructions.DirectProduct(F_Sp_N_Steinberg, F_2)
-
 S = gens(Sp_N)
+gen_dict_Sp_2n = Dict(LowCohomologySOS.determine_letter(S[i]) => i for i in eachindex(S))
 
-quotient_hom_Steinberg = let source = F_Sp_N_Steinberg, target = Sp_N
-    Groups.Homomorphism((i, F, G) -> Groups.word_type(G)([i]), source, target)
+function quotient_hom_gens(i, F, G)
+    if i <= length(gens(F))
+        (type,i,j) = LowCohomologySOS.determine_letter(gens(F,i))
+
+        if type == :x
+            new_type, new_i, new_j = :A, i, j
+        elseif type == :y
+            new_type, new_i, new_j = :B, max(i,j), min(i,j) + n
+        elseif type == :yt
+            new_type, new_i, new_j = :B, min(i,j) + n, max(i,j)
+        elseif type == :z
+            new_type, new_i, new_j = :B, i, i + n
+        else # type :zt
+            new_type, new_i, new_j = :B, i + n, i
+        end
+
+        sp_2n_i_index = gen_dict_Sp_2n[MatrixGroups.ElementarySymplectic{2*n}(new_type,new_i,new_j)]
+
+        return Groups.word_type(G)([sp_2n_i_index]) # seems to be the same as "word([sp_2n_i_index])"
+    else
+        return Groups.word_type(G)(word(G(quotient_hom_gens(i-length(gens(F)),F,G))^(-1)))
+    end
 end
+
+quotient_hom = let source = Extended_f_sp_2n, target = Sp_N
+    Groups.Homomorphism((i, F, G) -> quotient_hom_gens(i, F,G ), source, target)
+end
+
+# below code to change
 
 for i in eachindex(S)
     @assert quotient_hom_Steinberg(gens(F_Sp_N_Steinberg,i)) == S[i]
