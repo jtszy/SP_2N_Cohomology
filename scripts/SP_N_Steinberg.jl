@@ -18,7 +18,6 @@ using SymbolicWedderburn
 n = 3
 
 Sp_N = MatrixGroups.SymplecticGroup{2*n}(Int8)
-F_Sp_N_Steinberg = FreeGroup(alphabet(Sp_N))
 
 function extended_f_sp_2n(n::Integer)
     range_as_list = [i for i in 1:n]
@@ -29,8 +28,8 @@ function extended_f_sp_2n(n::Integer)
         [(:x,i,j) for (i,j) in ordered_pairs],
         [(:y,i,j) for (i,j) in unordered_pairs],
         [(:yt,i,j) for (i,j) in unordered_pairs],
-        [(:z,i,j) for (i,j) in unordered_pairs],
-        [(:zt,i,j) for (i,j) in unordered_pairs],
+        [(:z,i,j) for (i,j) in ordered_pairs],
+        [(:zt,i,j) for (i,j) in ordered_pairs],
         [(:X,i,j) for (i,j) in ordered_pairs],
         [(:Y,i,j) for (i,j) in unordered_pairs],
         [(:Yt,i,j) for (i,j) in unordered_pairs],
@@ -82,10 +81,10 @@ function relations_St(
     N::Integer;
     sq_adj_op = "all"
 )
-    gen_dict = Dict(LowCohomologySOS.determine_letter(gens(F_G, i)) => gens(F_G, i) for i in eachindex(S))
+    gen_dict = Dict(LowCohomologySOS.determine_letter(gens(F_G, i)) => gens(F_G, i) for i in eachindex(gens(F_G)))
 
     range_as_list = [i for i in 1:N]
-    pairs = [(i,j) for i ∈ 1:n for j ∈ deleteat!(copy(range_as_list), findall(j->j==i,copy(range_as_list)))]
+    pairs = [(i,j) for i ∈ 1:N for j ∈ deleteat!(copy(range_as_list), findall(j->j==i,copy(range_as_list)))]
     triples = [(i,j,k) for i ∈ range_as_list
                     for j ∈ deleteat!(copy(range_as_list), findall(j->j==i,copy(range_as_list))) 
                     for k ∈ deleteat!(copy(range_as_list), findall(k->k∈[i,j],copy(range_as_list)))]
@@ -278,47 +277,86 @@ function relations_St(
     end
 end
 
-# below code to change
+function symplectic_min_supports(
+    quotient_hom,
+    S;
+    rels = "all"
+)   
+    Sp_N = quotient_hom.target
+    F_Sp_N_Steinberg = quotient_hom.source
 
-for i in eachindex(S)
-    @assert quotient_hom_Steinberg(gens(F_Sp_N_Steinberg,i)) == S[i]
-    @assert quotient_hom_Steinberg(gens(F_Sp_N_Steinberg,i)^(-1)) == S[i]^(-1)
+    N = div(size(MatrixGroups.matrix_repr(first(S)))[1],2)
+
+    Steinberg_relations = relations_St(F_Sp_N_Steinberg, N, sq_adj_op = rels)
+
+    for r in Steinberg_relations
+        @assert quotient_hom(r) == one(Sp_N)
+    end 
+
+    sup_jacobian = SP_4_Cohomology.support_jacobian(vcat(Steinberg_relations, S), quotient_hom)
+
+    min_support = SP_4_Cohomology.minimalistic_support(Steinberg_relations, quotient_hom)
+
+    return sup_jacobian, min_support
 end
 
-Solution = Dict()
-Solution["lambda_list"] = []
-Solution["Q_list"] = []
-Solution["result_list"] = []
+# support_jacobian, min_support = symplectic_min_supports(quotient_hom, S; rels = "adj")
 
+# Steinberg_relations = relations_St(Extended_f_sp_2n, n; sq_adj_op = "adj")
 
-# support_jacobian, min_support = SP_4_Cohomology.symplectic_min_supports(quotient_hom_Steinberg, S; rels = "adj")
+support_jacobian, min_support = symplectic_min_supports(quotient_hom, S)
 
-# Steinberg_relations = SP_4_Cohomology.relations_St(F_Sp_N_Steinberg, S, N; sq_adj_ = "adj")
-
-support_jacobian, min_support = SP_4_Cohomology.symplectic_min_supports(quotient_hom_Steinberg, S)
-
-Steinberg_relations = SP_4_Cohomology.relations_St(F_Sp_N_Steinberg, S, N)
+Steinberg_relations = relations_St(Extended_f_sp_2n, n)
 
 for r in Steinberg_relations
-    @assert quotient_hom_Steinberg(r) == one(Sp_N)
+    @assert quotient_hom(r) == one(Sp_N)
 end
 
-Δ₁, I_N, Δ₁⁺, Δ₁⁻ = LowCohomologySOS.spectral_gap_elements(quotient_hom_Steinberg, Steinberg_relations, support_jacobian);
+Δ₁, I_N, Δ₁⁺, Δ₁⁻ = LowCohomologySOS.spectral_gap_elements(quotient_hom, Steinberg_relations, support_jacobian);
 
-Δm_mono, Δm_sq, Δm_adj_mi, Δm_adj_db, Δm_op  = SP_4_Cohomology.mono_sq_adj_op(Δ₁⁻, S)
+# todo from this point
+function sq_adj_op(
+    Δ₁⁻
+)
+    sq_pairs = []
+    adj_pairs = []
+    op_pairs = []
+    A = alphabet(Extended_f_sp_2n)
+    S = gens(Extended_f_sp_2n)
+    for s in eachindex(S)
+        for t in eachindex(S)
+            s_i, s_j = A[word(S[s])[1]][2], A[word(S[s])[1]][3]
+            t_i, t_j = A[word(S[t])[1]][2], A[word(S[t])[1]][3]
+            if length(intersect!([s_i,s_j],[t_i,t_j])) == 2
+                push!(sq_pairs,(s,t))
+            elseif length(intersect!([s_i,s_j],[t_i,t_j])) == 1
+                push!(adj_pairs,(s,t))
+            else
+                push!(op_pairs,(s,t))
+            end
+        end
+    end
+    sq = [(i,j) in sq_pairs ? Δ₁⁻[i,j] : zero(RG) for i in eachindex(S), j in eachindex(S)]
+    adj = [(i,j) in adj_pairs ? Δ₁⁻[i,j] : zero(RG) for i in eachindex(S), j in eachindex(S)]
+    op = [(i,j) in op_pairs ? Δ₁⁻[i,j] : zero(RG) for i in eachindex(S), j in eachindex(S)]
 
-I_N_mono, I_N_sq = SP_4_Cohomology.mono_sq_adj_op(I_N, S)
+    @assert sq+adj+op == Δ₁⁻
 
-# Δ = Δm_adj_db + Δ₁⁺
-Δ = Δm_sq+ Δm_adj_mi+ Δm_adj_db+ Δm_op + Δ₁⁺
+    return sq, adj, op
+end
+
+Δm_sq, Δm_adj, Δm_op  = SP_4_Cohomology.sq_adj_op(Δ₁⁻)
+
+# Δ = Δm_adj + Δ₁⁺
+Δ = Δm_sq + Δm_adj + Δm_op + Δ₁⁺
 Δ = Δ₁
 
 RG = LowCohomologySOS.group_ring(Sp_N, min_support, star_multiplication = true)
 
 Δ = LowCohomologySOS.embed.(identity, Δ, Ref(RG))
-# I_N = LowCohomologySOS.embed.(identity, I_N_sq, Ref(RG))
 I_N = LowCohomologySOS.embed.(identity, I_N, Ref(RG))
 
+# Wedderburn has to be customized for zij's ########################################################
 constraints_basis, psd_basis, Σ, action = SP_4_Cohomology.wedderburn_data(RG.basis, min_support, S);
 
 # there is no point of finding a solution if we don't provide invariant matrix
@@ -340,25 +378,21 @@ end
         # 0.7 / 0.05
     )
 end
+###########################################################################################
+
+@time begin
+    sos_problem, P = LowCohomologySOS.sos_problem(
+        Δ,
+        I_N
+    )
+end
 
 # Find a numerical spectral gap
 JuMP.set_optimizer(sos_problem, SP_4_Cohomology.scs_opt(eps = 1e-6, max_iters = 500))
 JuMP.optimize!(sos_problem)
 
 # Certify the numerical estimate
+# λ, Q = LowCohomologySOS.get_solution(sos_problem, P, w_dec_matrix)
 λ, Q = LowCohomologySOS.get_solution(sos_problem, P, w_dec_matrix)
 
-# Q, λ = deserialize("./Steinberg_Solution_Sp_6.sjl")
-# Q = Q[2]
-# λ = λ[2]
-
 result_bool, _ = LowCohomologySOS.certify_sos_decomposition(Δ, I_N, λ, Q, min_support)
-
-
-Solution["lambda_list"] = push!(Solution["lambda_list"], λ)
-Solution["Q_list"] = push!(Solution["Q_list"], Q)
-Solution["result_list"] = push!(Solution["result_list"], result_bool)
-
-
-
-# serialize("./Steinberg_Solution_Sp_6_comm_relations.sjl", Solution)
