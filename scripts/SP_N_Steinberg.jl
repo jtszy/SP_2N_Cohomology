@@ -13,6 +13,7 @@ using SCS
 using Serialization
 using SP_4_Cohomology
 using SparseArrays
+using StarAlgebras
 using SymbolicWedderburn
 
 n = 3
@@ -22,7 +23,7 @@ Sp_N = MatrixGroups.SymplecticGroup{2*n}(Int8)
 function extended_f_sp_2n(n::Integer)
     range_as_list = [i for i in 1:n]
     ordered_pairs = [(i,j) for i ∈ 1:n for j ∈ deleteat!(copy(range_as_list), findall(j->j==i,copy(range_as_list)))]
-    unordered_pairs = [(i,j) for i ∈ 1:n for j ∈ deleteat!(copy(range_as_list), findall(j->j<i,copy(range_as_list)))]
+    unordered_pairs = [(i,j) for i ∈ 1:n for j ∈ deleteat!(copy(range_as_list), findall(j->j<=i,copy(range_as_list)))]
     
     x_y_z_gens = vcat(
         [(:x,i,j) for (i,j) in ordered_pairs],
@@ -102,7 +103,7 @@ function relations_St(
     zt(i,j) = gen_dict[(:zt,i,j)]
 
     relations_sq = vcat(
-        [z(i,j)*zt(i,j)^(-1)*z(i,j)*z(i,j)*zt(i,j)^(-1)*z(i,j)*z(i,j)*zt(i,j)^(-1)*z(i,j)*z(i,j)*zt(i,j)^(-1)*z(i,j) for (i,j) in pairs],
+        # [z(i,j)*zt(i,j)^(-1)*z(i,j)*z(i,j)*zt(i,j)^(-1)*z(i,j)*z(i,j)*zt(i,j)^(-1)*z(i,j)*z(i,j)*zt(i,j)^(-1)*z(i,j) for (i,j) in pairs],
 
         # [com(x(i,j),y(i,j))*z(i,j)^(-2) for (i,j) in pairs],
         # [com(x(i,j),yt(i,j))*zt(j,i)^2 for (i,j) in pairs],
@@ -134,43 +135,43 @@ function relations_St(
     )
     
     relations_adj = vcat(
-        # [com(x(i,j),x(j,k))*x(i,k)^(-1) for (i,j,k) in triples],
-        # [com(x(i,j),y(j,k))*y(i,k)^(-1) for (i,j,k) in triples],
-        # [com(x(i,j),yt(i,k))*yt(j,k) for (i,j,k) in triples],
+        [com(x(i,j),x(j,k))*x(i,k)^(-1) for (i,j,k) in triples],
+        [com(x(i,j),y(j,k))*y(i,k)^(-1) for (i,j,k) in triples],
+        [com(x(i,j),yt(i,k))*yt(j,k) for (i,j,k) in triples],
         
-        # [com(x(i,j),y(i,j))*z(i,k)^(-2) for (i,j,k) in triples],
-        # [com(x(i,j),yt(i,j))*zt(j,k)^2 for (i,j,k) in triples],
-        # [com(x(i,j),z(j,k))*(y(i,j)*z(i,k))^(-1) for (i,j,k) in triples],
-        # [com(x(i,j),z(j,k))*(z(i,k)*y(i,j))^(-1) for (i,j,k) in triples],
+        [com(x(i,j),y(i,j))*z(i,k)^(-2) for (i,j,k) in triples],
+        [com(x(i,j),yt(i,j))*zt(j,k)^2 for (i,j,k) in triples],
+        [com(x(i,j),z(j,k))*(y(i,j)*z(i,k))^(-1) for (i,j,k) in triples],
+        [com(x(i,j),z(j,k))*(z(i,k)*y(i,j))^(-1) for (i,j,k) in triples],
         [com(z(i,k),y(i,j)) for (i,j,k) in triples],
-        # [com(x(i,j),zt(i,k))*yt(i,j)*zt(j,k)^(-1) for (i,j,k) in triples],
-        # [com(x(i,j),zt(i,k))*zt(j,k)^(-1)*yt(i,j) for (i,j,k) in triples],
+        [com(x(i,j),zt(i,k))*yt(i,j)*zt(j,k)^(-1) for (i,j,k) in triples],
+        [com(x(i,j),zt(i,k))*zt(j,k)^(-1)*yt(i,j) for (i,j,k) in triples],
         [com(zt(j,k),yt(i,j)^(-1)) for (i,j,k) in triples],
-        # [com(y(i,j),zt(i,k))*z(j,k)*x(j,i)^(-1) for (i,j,k) in triples],
-        # [com(y(i,j),zt(i,k))*x(j,i)^(-1)*z(j,k) for (i,j,k) in triples],
+        [com(y(i,j),zt(i,k))*z(j,k)*x(j,i)^(-1) for (i,j,k) in triples],
+        [com(y(i,j),zt(i,k))*x(j,i)^(-1)*z(j,k) for (i,j,k) in triples],
         [com(x(j,i),z(j,k)^(-1)) for (i,j,k) in triples],
-        # [com(yt(i,j), z(i,k))*zt(j,k)*x(i,j) for (i,j,k) in triples],
-        # [com(yt(i,j), z(i,k))*x(i,j)*zt(j,k) for (i,j,k) in triples],
+        [com(yt(i,j), z(i,k))*zt(j,k)*x(i,j) for (i,j,k) in triples],
+        [com(yt(i,j), z(i,k))*x(i,j)*zt(j,k) for (i,j,k) in triples],
 
         [com(x(i,j), z(i,k)) for (i,j,k) in triples],
-        [com(z(i,k), x(i,j)) for (i,j,k) in triples],
+        # [com(z(i,k), x(i,j)) for (i,j,k) in triples],
         [com(x(i,j), zt(j,k)) for (i,j,k) in triples],
-        [com(zt(j,k), x(i,j)) for (i,j,k) in triples],
+        # [com(zt(j,k), x(i,j)) for (i,j,k) in triples],
         [com(y(i,j), z(j,k)) for (i,j,k) in triples],
-        [com(z(j,k), y(i,j)) for (i,j,k) in triples],
+        # [com(z(j,k), y(i,j)) for (i,j,k) in triples],
         [com(yt(i,j), zt(j,k)) for (i,j,k) in triples],
-        [com(zt(j,k), yt(i,j)) for (i,j,k) in triples],
+        # [com(zt(j,k), yt(i,j)) for (i,j,k) in triples],
         [com(y(i,j), z(i,k)) for (i,j,k) in triples],
-        [com(z(i,k), y(i,j)) for (i,j,k) in triples],
+        # [com(z(i,k), y(i,j)) for (i,j,k) in triples],
         [com(yt(i,j), zt(i,k)) for (i,j,k) in triples],
-        [com(zt(i,k), yt(i,j)) for (i,j,k) in triples],
+        # [com(zt(i,k), yt(i,j)) for (i,j,k) in triples],
 
         [com(x(i,j), x(i,k)) for (i,j,k) in triples],
         [com(x(i,j), x(k,j)) for (i,j,k) in triples],
         [com(x(i,j), y(i,k)) for (i,j,k) in triples],
-        [com(y(i,k), x(i,j)) for (i,j,k) in triples],
+        # [com(y(i,k), x(i,j)) for (i,j,k) in triples],
         [com(x(i,j), yt(k,j)) for (i,j,k) in triples],
-        [com(yt(k,j), x(i,j)) for (i,j,k) in triples],
+        # [com(yt(k,j), x(i,j)) for (i,j,k) in triples],
         [com(y(i,j), y(j,k)) for (i,j,k) in triples],
         [com(y(i,j), y(i,k)) for (i,j,k) in triples],
         [com(y(i,j), y(k,j)) for (i,j,k) in triples],
@@ -179,12 +180,11 @@ function relations_St(
         [com(yt(i,j), yt(k,j)) for (i,j,k) in triples],
 
         [com(z(i,j), y(j,k)) for (i,j,k) in triples],
+        # [com(y(j,k), z(i,j)) for (i,j,k) in triples],
         [com(z(i,k), y(j,k)) for (i,j,k) in triples],
-        [com(y(j,k), z(i,j)) for (i,j,k) in triples],
-        [com(y(j,k), z(i,k)) for (i,j,k) in triples],
+        # [com(y(j,k), z(i,k)) for (i,j,k) in triples],
         [com(z(i,j), yt(j,k)) for (i,j,k) in triples],
         [com(z(i,k), yt(j,k)) for (i,j,k) in triples],
-        [com(yt(j,k), z(i,j)) for (i,j,k) in triples],
         [com(yt(j,k), z(i,k)) for (i,j,k) in triples],
         [com(z(i,j), x(j,k)) for (i,j,k) in triples],
         [com(z(i,k), x(j,k)) for (i,j,k) in triples],
@@ -341,7 +341,7 @@ end
 # Δ = Δ₁
 
 RG = LowCohomologySOS.group_ring(Sp_N, min_support, star_multiplication = true)
-RG.mstructure
+
 Δ = LowCohomologySOS.embed.(identity, Δ, Ref(RG))
 I_N = LowCohomologySOS.embed.(identity, I_N, Ref(RG))
 
@@ -349,10 +349,10 @@ I_N = LowCohomologySOS.embed.(identity, I_N, Ref(RG))
 constraints_basis, psd_basis, Σ, action = SP_4_Cohomology.wedderburn_data(RG.basis, min_support, S);
 
 # there is no point of finding a solution if we don't provide invariant matrix
-for σ in Σ
-    @assert LowCohomologySOS.act_on_matrix(Δ₁, σ, action.alphabet_perm, S) == Δ₁
-    @assert LowCohomologySOS.act_on_matrix(I_N, σ, action.alphabet_perm, S) == I_N
-end
+# for σ in Σ
+#     @assert LowCohomologySOS.act_on_matrix(Δ₁, σ, action.alphabet_perm, S) == Δ₁
+#     @assert LowCohomologySOS.act_on_matrix(I_N, σ, action.alphabet_perm, S) == I_N
+# end
 
 @time begin
     @info "Wedderburn:"
@@ -361,7 +361,7 @@ end
 
 @time begin
     sos_problem, P = LowCohomologySOS.sos_problem(
-        Δ₁,
+        Δ,
         I_N,
         w_dec_matrix
         # 0.7 / 0.05
