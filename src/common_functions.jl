@@ -71,7 +71,6 @@ function symplectic_min_supports(
     Steinberg_relations = relations_St(F_Sp_N_Steinberg, S, N, sq_adj_ = rels)
 
     for r in Steinberg_relations
-        print(r)
         @assert quotient_hom(r) == one(Sp_N)
     end 
 
