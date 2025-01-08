@@ -5,7 +5,7 @@ ENV["JULIA_NUM_THREADS"] = Sys.CPU_THREADS ÷ 2
 LinearAlgebra.BLAS.set_num_threads(Sys.CPU_THREADS ÷ 2)
 
 using Groups
-using IntervalArithmetic
+# using IntervalArithmetic
 using JuMP
 using LowCohomologySOS
 using PermutationGroups
@@ -76,6 +76,8 @@ quotient_hom = let source = Extended_f_sp_2n, target = Sp_N
     Groups.Homomorphism((i, F, G) -> quotient_hom_gens(i, F,G ), source, target)
 end
 
+com(a,b) = SP_4_Cohomology.com(a,b)
+
 function relations_St(
     F_G::Groups.FreeGroup,
     N::Integer;
@@ -102,54 +104,53 @@ function relations_St(
     relations_sq = vcat(
         [z(i,j)*zt(i,j)^(-1)*z(i,j)*z(i,j)*zt(i,j)^(-1)*z(i,j)*z(i,j)*zt(i,j)^(-1)*z(i,j)*z(i,j)*zt(i,j)^(-1)*z(i,j) for (i,j) in pairs],
 
-        [com(x(i,j),y(i,j))*z(i,j)^(-2) for (i,j) in pairs],
-        [com(x(i,j),yt(i,j))*zt(j,i)^2 for (i,j) in pairs],
-        [com(x(i,j),z(j,i))*(y(i,j)*z(i,j))^(-1) for (i,j) in pairs],
-        [com(x(i,j),z(j,i))*(z(i,j)*y(i,j))^(-1) for (i,j) in pairs],
-        [com(z(i,j),y(i,j)) for (i,j) in pairs],
-        [com(x(i,j),zt(i,j))*yt(i,j)*zt(j,i)^(-1) for (i,j) in pairs],
-        [com(x(i,j),zt(i,j))*zt(j,i)^(-1)*yt(i,j) for (i,j) in pairs],
-        [com(zt(j,i),yt(i,j)^(-1)) for (i,j) in pairs],
-        [com(y(i,j),zt(i,j))*z(j,i)*x(j,i)^(-1) for (i,j) in pairs],
-        [com(y(i,j),zt(i,j))*x(j,i)^(-1)*z(j,i) for (i,j) in pairs],
-        [com(x(j,i),z(j,i)^(-1)) for (i,j) in pairs],
-        [com(yt(i,j), z(i,j))*zt(j,i)*x(i,j) for (i,j) in pairs],
-        [com(yt(i,j), z(i,j))*x(i,j)*zt(j,i) for (i,j) in pairs],
-        [com(x(i,j),zt(j,i)) for (i,j) in pairs],
+        # [com(x(i,j),y(i,j))*z(i,j)^(-2) for (i,j) in pairs],
+        # [com(x(i,j),yt(i,j))*zt(j,i)^2 for (i,j) in pairs],
+        # [com(x(i,j),z(j,i))*(y(i,j)*z(i,j))^(-1) for (i,j) in pairs],
+        # [com(x(i,j),z(j,i))*(z(i,j)*y(i,j))^(-1) for (i,j) in pairs],
+        # [com(z(i,j),y(i,j)) for (i,j) in pairs],
+        # [com(x(i,j),zt(i,j))*yt(i,j)*zt(j,i)^(-1) for (i,j) in pairs],
+        # [com(x(i,j),zt(i,j))*zt(j,i)^(-1)*yt(i,j) for (i,j) in pairs],
+        # [com(zt(j,i),yt(i,j)^(-1)) for (i,j) in pairs],
+        # [com(y(i,j),zt(i,j))*z(j,i)*x(j,i)^(-1) for (i,j) in pairs],
+        # [com(y(i,j),zt(i,j))*x(j,i)^(-1)*z(j,i) for (i,j) in pairs],
+        # [com(x(j,i),z(j,i)^(-1)) for (i,j) in pairs],
+        # [com(yt(i,j), z(i,j))*zt(j,i)*x(i,j) for (i,j) in pairs],
+        # [com(yt(i,j), z(i,j))*x(i,j)*zt(j,i) for (i,j) in pairs],
+        # [com(x(i,j),zt(j,i)) for (i,j) in pairs],
 
-        [com(x(i,j), z(i,j)) for (i,j) in pairs],
-        [com(z(i,j), x(i,j)) for (i,j) in pairs],
-        [com(x(i,j), zt(j,i)) for (i,j) in pairs],
-        [com(zt(j,i), x(i,j)) for (i,j) in pairs],
-        [com(y(i,j), z(j,i)) for (i,j) in pairs],
-        [com(z(j,i), y(i,j)) for (i,j) in pairs],
-        [com(yt(i,j), zt(j,i)) for (i,j) in pairs],
-        [com(zt(j,i), yt(i,j)) for (i,j) in pairs],
-        [com(y(i,j), z(i,j)) for (i,j) in pairs],
-        [com(z(i,j), y(i,j)) for (i,j) in pairs],
-        [com(yt(i,j), zt(i,j)) for (i,j) in pairs],
-        [com(zt(i,j), yt(i,j)) for (i,j) in pairs],
+        # [com(x(i,j), z(i,j)) for (i,j) in pairs],
+        # [com(z(i,j), x(i,j)) for (i,j) in pairs],
+        # [com(x(i,j), zt(j,i)) for (i,j) in pairs],
+        # [com(zt(j,i), x(i,j)) for (i,j) in pairs],
+        # [com(y(i,j), z(j,i)) for (i,j) in pairs],
+        # [com(z(j,i), y(i,j)) for (i,j) in pairs],
+        # [com(yt(i,j), zt(j,i)) for (i,j) in pairs],
+        # [com(zt(j,i), yt(i,j)) for (i,j) in pairs],
+        # [com(y(i,j), z(i,j)) for (i,j) in pairs],
+        # [com(z(i,j), y(i,j)) for (i,j) in pairs],
+        # [com(yt(i,j), zt(i,j)) for (i,j) in pairs],
+        # [com(zt(i,j), yt(i,j)) for (i,j) in pairs],
     )
-
+    
     relations_adj = vcat(
-        [com(x(i,j),x(j,k))*x(i,k)^(-1) for (i,j,k) in triples],
-        [com(x(i,j),y(j,k))*y(i,k)^(-1) for (i,j,k) in triples],
-        [com(x(i,j),yt(i,k))*yt(j,k) for (i,j,k) in triples],
+        # [com(x(i,j),x(j,k))*x(i,k)^(-1) for (i,j,k) in triples],
+        # [com(x(i,j),y(j,k))*y(i,k)^(-1) for (i,j,k) in triples],
+        # [com(x(i,j),yt(i,k))*yt(j,k) for (i,j,k) in triples],
         
-        [com(x(i,j),y(i,j))*z(i,k)^(-2) for (i,j,k) in triples],
-        [com(x(i,j),yt(i,j))*zt(j,k)^2 for (i,j,k) in triples],
-        [com(x(i,j),z(j,k))*(y(i,j)*z(i,k))^(-1) for (i,j,k) in triples],
-        [com(x(i,j),z(j,k))*(z(i,k)*y(i,j))^(-1) for (i,j,k) in triples],
+        # [com(x(i,j),y(i,j))*z(i,k)^(-2) for (i,j,k) in triples],
+        # [com(x(i,j),yt(i,j))*zt(j,k)^2 for (i,j,k) in triples],
+        # [com(x(i,j),z(j,k))*(y(i,j)*z(i,k))^(-1) for (i,j,k) in triples],
+        # [com(x(i,j),z(j,k))*(z(i,k)*y(i,j))^(-1) for (i,j,k) in triples],
         [com(z(i,k),y(i,j)) for (i,j,k) in triples],
-        [com(x(i,j),zt(i,k))*yt(i,j)*zt(j,k)^(-1) for (i,j,k) in triples],
-        [com(x(i,j),zt(i,k))*zt(j,k)^(-1)*yt(i,j) for (i,j,k) in triples],
+        # [com(x(i,j),zt(i,k))*yt(i,j)*zt(j,k)^(-1) for (i,j,k) in triples],
+        # [com(x(i,j),zt(i,k))*zt(j,k)^(-1)*yt(i,j) for (i,j,k) in triples],
         [com(zt(j,k),yt(i,j)^(-1)) for (i,j,k) in triples],
-        [com(y(i,j),zt(i,k))*z(j,k)*x(j,i)^(-1) for (i,j,k) in triples],
-        [com(y(i,j),zt(i,k))*x(j,i)^(-1)*z(j,k) for (i,j,k) in triples],
+        # [com(y(i,j),zt(i,k))*z(j,k)*x(j,i)^(-1) for (i,j,k) in triples],
+        # [com(y(i,j),zt(i,k))*x(j,i)^(-1)*z(j,k) for (i,j,k) in triples],
         [com(x(j,i),z(j,k)^(-1)) for (i,j,k) in triples],
-        [com(yt(i,j), z(i,k))*zt(j,k)*x(i,j) for (i,j,k) in triples],
-        [com(yt(i,j), z(i,k))*x(i,j)*zt(j,k) for (i,j,k) in triples],
-        [com(x(i,j),zt(j,k)) for (i,j,k) in triples],
+        # [com(yt(i,j), z(i,k))*zt(j,k)*x(i,j) for (i,j,k) in triples],
+        # [com(yt(i,j), z(i,k))*x(i,j)*zt(j,k) for (i,j,k) in triples],
 
         [com(x(i,j), z(i,k)) for (i,j,k) in triples],
         [com(z(i,k), x(i,j)) for (i,j,k) in triples],
@@ -174,8 +175,8 @@ function relations_St(
         [com(y(i,j), y(i,k)) for (i,j,k) in triples],
         [com(y(i,j), y(k,j)) for (i,j,k) in triples],
         [com(yt(i,j), yt(j,k)) for (i,j,k) in triples],
-        [com(yt(i,j), yt(j,k)) for (i,j,k) in triples],
-        [com(yt(i,j), yt(j,k)) for (i,j,k) in triples],
+        [com(yt(i,j), yt(i,k)) for (i,j,k) in triples],
+        [com(yt(i,j), yt(k,j)) for (i,j,k) in triples],
 
         [com(z(i,j), y(j,k)) for (i,j,k) in triples],
         [com(z(i,k), y(j,k)) for (i,j,k) in triples],
@@ -278,43 +279,30 @@ function relations_St(
 end
 
 function symplectic_min_supports(
+    Steinberg_relations,
     quotient_hom,
-    S;
-    rels = "all"
+    S
 )   
     Sp_N = quotient_hom.target
-    F_Sp_N_Steinberg = quotient_hom.source
-
-    N = div(size(MatrixGroups.matrix_repr(first(S)))[1],2)
-
-    Steinberg_relations = relations_St(F_Sp_N_Steinberg, N, sq_adj_op = rels)
 
     for r in Steinberg_relations
         @assert quotient_hom(r) == one(Sp_N)
     end 
 
     sup_jacobian = SP_4_Cohomology.support_jacobian(vcat(Steinberg_relations, S), quotient_hom)
-
     min_support = SP_4_Cohomology.minimalistic_support(Steinberg_relations, quotient_hom)
 
     return sup_jacobian, min_support
 end
 
-# support_jacobian, min_support = symplectic_min_supports(quotient_hom, S; rels = "adj")
+Steinberg_relations = relations_St(Extended_f_sp_2n, n, sq_adj_op = "adj")
+# support_jacobian, min_support = symplectic_min_supports(Steinberg_relations, quotient_hom, S)
 
-# Steinberg_relations = relations_St(Extended_f_sp_2n, n; sq_adj_op = "adj")
-
-support_jacobian, min_support = symplectic_min_supports(quotient_hom, S)
-
-Steinberg_relations = relations_St(Extended_f_sp_2n, n)
-
-for r in Steinberg_relations
-    @assert quotient_hom(r) == one(Sp_N)
-end
+# Steinberg_relations = relations_St(Extended_f_sp_2n, n)
+support_jacobian, min_support = symplectic_min_supports(Steinberg_relations, quotient_hom, S)
 
 Δ₁, I_N, Δ₁⁺, Δ₁⁻ = LowCohomologySOS.spectral_gap_elements(quotient_hom, Steinberg_relations, support_jacobian);
 
-# todo from this point
 function sq_adj_op(
     Δ₁⁻
 )
@@ -323,6 +311,7 @@ function sq_adj_op(
     op_pairs = []
     A = alphabet(Extended_f_sp_2n)
     S = gens(Extended_f_sp_2n)
+    RG = parent(first(Δ₁⁻))
     for s in eachindex(S)
         for t in eachindex(S)
             s_i, s_j = A[word(S[s])[1]][2], A[word(S[s])[1]][3]
@@ -345,14 +334,14 @@ function sq_adj_op(
     return sq, adj, op
 end
 
-Δm_sq, Δm_adj, Δm_op  = SP_4_Cohomology.sq_adj_op(Δ₁⁻)
+Δm_sq, Δm_adj, Δm_op  = sq_adj_op(Δ₁⁻)
 
 # Δ = Δm_adj + Δ₁⁺
 Δ = Δm_sq + Δm_adj + Δm_op + Δ₁⁺
-Δ = Δ₁
+# Δ = Δ₁
 
 RG = LowCohomologySOS.group_ring(Sp_N, min_support, star_multiplication = true)
-
+RG.mstructure
 Δ = LowCohomologySOS.embed.(identity, Δ, Ref(RG))
 I_N = LowCohomologySOS.embed.(identity, I_N, Ref(RG))
 
@@ -381,7 +370,7 @@ end
 ###########################################################################################
 
 @time begin
-    sos_problem, P = LowCohomologySOS.sos_problem(
+    sos_problem = LowCohomologySOS.sos_problem(
         Δ,
         I_N
     )
