@@ -10,7 +10,7 @@ using JuMP
 using LowCohomologySOS
 using PermutationGroups
 using SCS
-# using Serialization
+using Serialization
 using SP_4_Cohomology
 using SparseArrays
 using SymbolicWedderburn
@@ -270,12 +270,12 @@ end
 end
 
 # Find a numerical spectral gap
-JuMP.set_optimizer(sos_problem, SP_4_Cohomology.scs_opt(eps = 1e-6, max_iters = 25000))
+JuMP.set_optimizer(sos_problem, SP_4_Cohomology.scs_opt(eps = 1e-6, max_iters = 13000))
 JuMP.optimize!(sos_problem)
 
 # Certify the numerical estimate
 λ, Q = LowCohomologySOS.get_solution(sos_problem, P, w_dec_matrix)
 LowCohomologySOS.certify_sos_decomposition(Δ, I_N, λ, Q, min_support)
 
-# Solution = Dict("lambda" => λ, "Q" => Q)
-# serialize("./scripts/SP_6_replication_precomputed/Steinberg_Solution_Sp_6.sjl", Solution)
+solution = Dict("lambda" => λ, "Q" => Q)
+serialize("./scripts/Steinberg_Solution_Sp_6_adj.sjl", solution)
