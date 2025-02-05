@@ -59,64 +59,38 @@ function support_jacobian(relations, quotient_hom)
 end
 
 function symplectic_min_supports(
+    Steinberg_relations,
     quotient_hom,
-    S;
-    rels = "all"
+    S
 )   
-    Sp_N = quotient_hom.target
-    F_Sp_N_Steinberg = quotient_hom.source
-
-    N = div(size(MatrixGroups.matrix_repr(first(S)))[1],2)
-
-    Steinberg_relations = relations_St(F_Sp_N_Steinberg, S, N, sq_adj_ = rels)
-
-    for r in Steinberg_relations
-        @assert quotient_hom(r) == one(Sp_N)
-    end 
-
-    sup_jacobian = support_jacobian(vcat(Steinberg_relations, S), quotient_hom)
-
-    min_support = minimalistic_support(Steinberg_relations, quotient_hom)
+    sup_jacobian = SP_4_Cohomology.support_jacobian(vcat(Steinberg_relations, S), quotient_hom)
+    min_support = SP_4_Cohomology.minimalistic_support(Steinberg_relations, quotient_hom)
 
     return sup_jacobian, min_support
-
 end
 
-function sq_adj_op(
+function mono_sq_adj_op(
     Δ₁⁻,
-    S # gens of Sp_N without z
+    S # generating set indexing Δ₁⁻
 )
     RG = parent(first(Δ₁⁻))
     Sp2N = parent(first(RG.basis))
     N = Int8(sqrt(length(gens(Sp2N))/2))
-
+    mono_pairs = []
     sq_pairs = []
     adj_pairs = []
     op_pairs = []
-
-    M = length(S)
     A = alphabet(Sp2N)
-    
-    function index_pair(s::Int)
-        if s <= M
-            s_i, s_j = mod(A[word(S[s])[1]].i, N), mod(A[word(S[s])[1]].j, N)
-        elseif s <= Int(3*M/2)
-            s_i, s_j = Int(floor((s - 2*N^2 + 2*N) / (N-1))) + 1, mod(s - 1 - 2*N^2 + 2*N, N-1) + 1 + 
-                Int(Int(floor((s - 2*N^2 + 2*N) / (N-1))) + 1 <= mod(s - 1 - 2*N^2 + 2*N, N-1))
-        else
-            s_i, s_j = Int(floor((s - 3*N^2 + 3*N) / (N-1))) + 1, mod(s - 1 - 3*N^2 + 3*N, N-1) + 1 +
-                Int(Int(floor((s - 3*N^2 + 3*N) / (N-1))) + 1 <= mod(s - 1 - 3*N^2 + 3*N, N-1) )
-        end
-        return s_i, s_j
-    end
-    # needs to be checked
-
-    for s in 1:2*M
-        for t in 1:2*M
-            s_i, s_j = index_pair(s)
-            t_i, t_j = index_pair(t)
+    for s in eachindex(S)
+        for t in eachindex(S)
+            s_i, s_j = mod(A[word(S[s])[1]].i,N), mod(A[word(S[s])[1]].j,N)
+            t_i, t_j = mod(A[word(S[t])[1]].i,N), mod(A[word(S[t])[1]].j,N)
             if sort([s_i,s_j]) == sort([t_i, t_j])
-                push!(sq_pairs,(s,t))
+                if s_i == s_j
+                    push!(mono_pairs,(s,t))
+                else
+                    push!(sq_pairs,(s,t))
+                end
             elseif length(intersect!([s_i,s_j],[t_i,t_j])) == 1
                 push!(adj_pairs,(s,t))
             else
@@ -124,12 +98,12 @@ function sq_adj_op(
             end
         end
     end
+    mono = [(i,j) in mono_pairs ? Δ₁⁻[i,j] : zero(RG) for i in eachindex(S), j in eachindex(S)]
+    sq = [(i,j) in sq_pairs ? Δ₁⁻[i,j] : zero(RG) for i in eachindex(S), j in eachindex(S)]
+    adj = [(i,j) in adj_pairs ? Δ₁⁻[i,j] : zero(RG) for i in eachindex(S), j in eachindex(S)]
+    op = [(i,j) in op_pairs ? Δ₁⁻[i,j] : zero(RG) for i in eachindex(S), j in eachindex(S)]
 
-    sq = [(i,j) in sq_pairs ? Δ₁⁻[i,j] : zero(RG) for i in 1:2*M, j in 1:2*M]
-    adj = [(i,j) in adj_pairs ? Δ₁⁻[i,j] : zero(RG) for i in 1:2*M, j in 1:2*M]
-    op = [(i,j) in op_pairs ? Δ₁⁻[i,j] : zero(RG) for i in 1:2*M, j in 1:2*M]
+    @assert mono+sq+adj+op == Δ₁⁻
 
-    @assert sq+adj+op == Δ₁⁻
-
-    return sq, adj, op
+    return mono, sq, adj, op
 end
