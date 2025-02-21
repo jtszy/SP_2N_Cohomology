@@ -1,3 +1,4 @@
+# Function taken from Marek Kaluba's packages involving SDP's
 function scs_opt(;
     accel = 10,
     alpha = 1.5,

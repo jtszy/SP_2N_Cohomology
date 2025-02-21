@@ -84,8 +84,18 @@ function wedderburn_data(basis, half_basis, S)
 
         Σ = PermutationGroups.SymmetricGroup(N)
 
-        actions = LowCohomologySOS.WedderburnActions(alphabet(parent(first(S))), Σ, SP_4_Cohomology.conjugation, S, basis)
-        constraints_basis, psd_basis = LowCohomologySOS.matrix_bases(basis, half_basis, S)
+        actions = LowCohomologySOS.WedderburnActions(
+            alphabet(parent(first(S))), 
+            Σ, 
+            SP_4_Cohomology.conjugation, 
+            S, 
+            basis
+        )
+        constraints_basis, psd_basis = LowCohomologySOS.matrix_bases(
+            basis, 
+            half_basis, 
+            S
+        )
     end
     
     return constraints_basis, psd_basis, Σ, actions
