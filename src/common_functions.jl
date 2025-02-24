@@ -85,13 +85,11 @@ function mono_sq_adj_op(
         for t in eachindex(S)
             s_i, s_j = mod(A[word(S[s])[1]].i,N), mod(A[word(S[s])[1]].j,N)
             t_i, t_j = mod(A[word(S[t])[1]].i,N), mod(A[word(S[t])[1]].j,N)
-            if sort([s_i,s_j]) == sort([t_i, t_j])
-                if s_i == s_j
-                    push!(mono_pairs,(s,t))
-                else
-                    push!(sq_pairs,(s,t))
-                end
-            elseif length(intersect!([s_i,s_j],[t_i,t_j])) == 1
+            if length(union!([s_i,s_j],[t_i,t_j])) == 1
+                push!(mono_pairs,(s,t))
+            elseif length(union!([s_i,s_j],[t_i,t_j])) == 2
+                push!(sq_pairs,(s,t))
+            elseif length(union!([s_i,s_j],[t_i,t_j])) == 3
                 push!(adj_pairs,(s,t))
             else
                 push!(op_pairs,(s,t))
