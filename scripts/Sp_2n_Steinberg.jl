@@ -14,8 +14,10 @@ using SP_4_Cohomology
 using SparseArrays
 using SymbolicWedderburn
 
-precomputed = parse(String, ARGS[1])
-N = 3
+
+N = parse(Int64, ARGS[1])
+# precomputed = parse(String, ARGS[2])
+# N = 2
 # precomputed = false
 
 # Define Sp₂ₙ(Z) and the quotient homomorphism on it from the free group on Sp₂ₙ(Z)'s gens
@@ -52,16 +54,20 @@ support_jacobian, min_support = SP_4_Cohomology.symplectic_min_supports(
     support_jacobian
 );
 Δm_mono, Δm_sq, Δm_adj, Δm_op  = SP_4_Cohomology.mono_sq_adj_op(Δ₁⁻, S)
-I_mono, I_sq, I_adj, I_op  = SP_4_Cohomology.mono_sq_adj_op(I_N_whole, S)
-laplacian = Δm_adj + Δ₁⁺
+laplacian = (N == 3 ? Δm_adj + Δ₁⁺ : Δm_sq + Δ₁⁺)
 RG = LowCohomologySOS.group_ring(Sp_2N, min_support, star_multiplication = true)
 laplacian = LowCohomologySOS.embed.(identity, laplacian, Ref(RG))
 I_N = LowCohomologySOS.embed.(identity, I_N_whole, Ref(RG))
 
 # Either compute or load the numerical solution of the corresponding SDP
+descr = (N == 3 ? "_Sp_6_adj.sjl" : "_Sp_4_sq.sjl")
 if !precomputed
     # Wedderburn symmetrization
-    constraints_basis, psd_basis, Σ, action = SP_4_Cohomology.wedderburn_data(RG.basis, min_support, S);
+    constraints_basis, psd_basis, Σ, action = SP_4_Cohomology.wedderburn_data(
+        RG.basis, 
+        min_support, 
+        S
+    )
     for σ in Σ
         @assert LowCohomologySOS.act_on_matrix(laplacian, σ, action.alphabet_perm, S) == laplacian
         @assert LowCohomologySOS.act_on_matrix(I_N, σ, action.alphabet_perm, S) == I_N
@@ -75,21 +81,22 @@ if !precomputed
     )
 
     # Define and solve the corresponding SDP problem
+    max_iters_ = (N == 3 ? 100_000 : 10_000)
     sos_problem, P = LowCohomologySOS.sos_problem(
         laplacian,
         I_N,
         w_dec_matrix
     )
-    JuMP.set_optimizer(sos_problem, SP_4_Cohomology.scs_opt(eps = 1e-8, max_iters = 300_000))
+    JuMP.set_optimizer(sos_problem, SP_4_Cohomology.scs_opt(eps = 1e-6, max_iters = max_iters_))
     JuMP.optimize!(sos_problem)
     λ, Q = LowCohomologySOS.get_solution(sos_problem, P, w_dec_matrix)
 
     # Serialize the solution
     solution = Dict("lambda" => λ, "Q" => Q)
-    serialize("./scripts/Steinberg_Solution_Sp_6_adj.sjl", solution)
+    serialize("./scripts/Steinberg_Solution"*descr, solution)
 else
     # Load the precomputed numerical solution
-    solution = deserialize("./scripts/Steinberg_Solution_Sp_6_adj.sjl"*descr)
+    solution = deserialize("./scripts/Steinberg_Solution"*descr)
     λ, Q = solution["lambda"], solution["Q"]
 end
 

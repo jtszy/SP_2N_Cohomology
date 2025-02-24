@@ -13,7 +13,6 @@ function certify_sos_decomposition(
     residual = eoi - LowCohomologySOS.sos_from_matrix(parent(first(X)), Q, support)
     max_norm = 0
     for i in 1:size(residual)[1]
-        print(i, " / ", size(residual)[1], "\n")
         current_norm = @interval(0)
         for j in 1:size(residual)[2]
             current_norm += norm(residual[i,j],1)
