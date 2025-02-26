@@ -18,7 +18,7 @@ using SymbolicWedderburn
 # sq_adj = parse(String, ARGS[1])
 # precomputed = parse(String, ARGS[2])
 N = 3
-sq_adj = "sq"
+sq_adj = "adj"
 precomputed = false
 
 # Define Sp₂ₙ(Z) and the quotient homomorphism on it from the free group on Sp₂ₙ(Z)'s gens
