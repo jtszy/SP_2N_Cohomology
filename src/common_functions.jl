@@ -40,35 +40,6 @@ function minimalistic_support(relations, quotient_hom)
     return min_support
 end
 
-function support_jacobian(relations, quotient_hom)
-    Sp_N = quotient_hom.target
-    F_G = quotient_hom.source
-
-    support_jacobian = [one(Sp_N)]
-    for r in relations
-        current_factor = one(Sp_N)
-        for i in 1:length(word(r))
-            g = quotient_hom(F_G(word(r)[i:i]))
-            push!(support_jacobian,current_factor*g)
-            current_factor *= g
-        end
-    end
-    support_jacobian = unique(support_jacobian)
-
-    return support_jacobian
-end
-
-function symplectic_min_supports(
-    Steinberg_relations,
-    quotient_hom,
-    S
-)   
-    sup_jacobian = SP_4_Cohomology.support_jacobian(vcat(Steinberg_relations, S), quotient_hom)
-    min_support = SP_4_Cohomology.minimalistic_support(Steinberg_relations, quotient_hom)
-
-    return sup_jacobian, min_support
-end
-
 function mono_sq_adj_op(
     Δ₁⁻,
     S # generating set indexing Δ₁⁻
@@ -104,4 +75,33 @@ function mono_sq_adj_op(
     @assert mono+sq+adj+op == Δ₁⁻
 
     return mono, sq, adj, op
+end
+
+function support_jacobian(relations, quotient_hom)
+    Sp_N = quotient_hom.target
+    F_G = quotient_hom.source
+
+    support_jacobian = [one(Sp_N)]
+    for r in relations
+        current_factor = one(Sp_N)
+        for i in 1:length(word(r))
+            g = quotient_hom(F_G(word(r)[i:i]))
+            push!(support_jacobian,current_factor*g)
+            current_factor *= g
+        end
+    end
+    support_jacobian = unique(support_jacobian)
+
+    return support_jacobian
+end
+
+function symplectic_min_supports(
+    Steinberg_relations,
+    quotient_hom,
+    S
+)   
+    sup_jacobian = SP_4_Cohomology.support_jacobian(vcat(Steinberg_relations, S), quotient_hom)
+    min_support = SP_4_Cohomology.minimalistic_support(Steinberg_relations, quotient_hom)
+
+    return sup_jacobian, min_support
 end
