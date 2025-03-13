@@ -22,7 +22,8 @@ function relations_St(
     ]
     
     relations_mono = vcat(
-        [(z(i)*zt(i)^(-1)*z(i))^4 for i in 1:N] # Matsumoto's relation
+        [(z(i)*zt(i)^(-1)*z(i))^4 for i in 1:N], # Matsumoto's relation
+        [com(z(i),zt(i)) for i in 1:N]
     )
     relations_sq = vcat(
         [com(x(i,j),y(i,j))*z(i)^(-2) for (i,j) in pairs],
@@ -63,6 +64,7 @@ function relations_St(
         return vcat(relations_mono, relations_sq, commutator_relations)
     else
         # Matsumoto's relation yields too big support
-        return vcat(relations_sq, relations_adj, commutator_relations)
+        return vcat(relations_mono, relations_sq, relations_adj, commutator_relations)
+        # return vcat(relations_sq, relations_adj, commutator_relations)
     end
 end
