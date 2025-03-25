@@ -23,7 +23,7 @@ function certify_sos_decomposition(
     end
     l1_norm = @interval(max_norm)
     
-    @info "l₁ norm of the error in interval arithmetic:" l1_norm radius(l1_norm)
+    @info "maximum of l₁ norms of rows of the error in interval arithmetic:" l1_norm radius(l1_norm)
     
     result = λ_interval - l1_norm
     

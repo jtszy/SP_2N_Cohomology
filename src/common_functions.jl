@@ -1,19 +1,3 @@
-function quotient_homomorphism(free_group, sp_n, gen_dict)
-    function F(i, source, target)
-        if source([i]) == one(free_group)
-            return one(sp_n)
-        end
-        for gen in keys(gen_dict)
-            if source([i]) == gen
-                return word(gen_dict[gen])
-            elseif source([i]) == gen^(-1)
-                return word(gen_dict[gen]^(-1))
-            end
-        end
-    end
-    Groups.Homomorphism(F, free_group, sp_n)
-end
-
 function com(x,y)
     x*y*x^(-1)*y^(-1)
 end
@@ -46,7 +30,7 @@ function mono_sq_adj_op(
 )
     RG = parent(first(Δ₁⁻))
     Sp2N = parent(first(RG.basis))
-    N = Int8(sqrt(length(gens(Sp2N))/2))
+    N = Int8(isqrt(div(length(gens(Sp2N)),2)))
     mono_pairs = []
     sq_pairs = []
     adj_pairs = []
@@ -77,6 +61,22 @@ function mono_sq_adj_op(
     return mono, sq, adj, op
 end
 
+function quotient_homomorphism(free_group, sp_n, gen_dict)
+    function F(i, source, target)
+        if source([i]) == one(free_group)
+            return one(sp_n)
+        end
+        for gen in keys(gen_dict)
+            if source([i]) == gen
+                return word(gen_dict[gen])
+            elseif source([i]) == gen^(-1)
+                return word(gen_dict[gen]^(-1))
+            end
+        end
+    end
+    Groups.Homomorphism(F, free_group, sp_n)
+end
+
 function support_jacobian(relations, quotient_hom)
     Sp_N = quotient_hom.target
     F_G = quotient_hom.source
@@ -96,12 +96,12 @@ function support_jacobian(relations, quotient_hom)
 end
 
 function symplectic_min_supports(
-    Steinberg_relations,
+    relations,
     quotient_hom,
     S
 )   
-    sup_jacobian = SP_4_Cohomology.support_jacobian(vcat(Steinberg_relations, S), quotient_hom)
-    min_support = SP_4_Cohomology.minimalistic_support(Steinberg_relations, quotient_hom)
+    sup_jacobian = SP_4_Cohomology.support_jacobian(vcat(relations, S), quotient_hom)
+    min_support = SP_4_Cohomology.minimalistic_support(relations, quotient_hom)
 
     return sup_jacobian, min_support
 end
