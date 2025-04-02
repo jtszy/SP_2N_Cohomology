@@ -63,8 +63,6 @@ function relations_St(
     if N == 2 
         return vcat(relations_mono, relations_sq, commutator_relations)
     else
-        # Matsumoto's relation yields too big support
         return vcat(relations_mono, relations_sq, relations_adj, commutator_relations)
-        # return vcat(relations_sq, relations_adj, commutator_relations)
     end
 end

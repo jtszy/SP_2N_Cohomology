@@ -15,10 +15,12 @@ using SparseArrays
 using SymbolicWedderburn
 
 
-# sq_adj = parse(String, ARGS[1])
-# precomputed = parse(String, ARGS[2])
+# Load the paremeters
+# N - parse(Integer, ARGS[1])
+# sq_adj = parse(String, ARGS[2])
+# precomputed = parse(String, ARGS[3])
 N = 3
-sq_adj = "adj"
+sq_adj_all = (sq_adj != "" ? sq_adj : "all")
 precomputed = false
 
 # Define Sp₂ₙ(Z) and the quotient homomorphism on it from the free group on Sp₂ₙ(Z)'s gens
@@ -52,13 +54,21 @@ support_jacobian, min_support = SP_4_Cohomology.symplectic_min_supports(
     support_jacobian
 );
 Δm_mono, Δm_sq, Δm_adj, Δm_op  = SP_4_Cohomology.mono_sq_adj_op(Δ₁⁻, S)
-laplacian = (sq_adj == "adj" ? Δm_adj + Δ₁⁺ : Δm_sq + Δ₁⁺)
+if sq_adj_all == "adj"
+    laplacian = Δm_adj + Δ₁⁺
+    descr = "_Sp_"*string(N)*"_adj.sjl"
+elseif sq_adj_all == "sq"
+    laplacian = Δm_sq + Δ₁⁺
+    descr = "_Sp_"*string(N)*"_sq.sjl"
+else
+    laplacian = Δ₁
+    descr = "_Sp_"*string(N)*"_delta_1.sjl"
+end
 RG = LowCohomologySOS.group_ring(Sp_2N, min_support, star_multiplication = true)
 laplacian = LowCohomologySOS.embed.(identity, laplacian, Ref(RG))
 I_N = LowCohomologySOS.embed.(identity, I_N_whole, Ref(RG))
 
 # Either compute or load the numerical solution of the corresponding SDP
-descr = (sq_adj == "adj" ? "_Sp_6_adj.sjl" : "_Sp_6_sq.sjl")
 if !precomputed
     # Wedderburn symmetrization
     constraints_basis, psd_basis, Σ, action = SP_4_Cohomology.wedderburn_data(
@@ -79,11 +89,12 @@ if !precomputed
     )
 
     # Define and solve the corresponding SDP problem
+    upper_bound = (sq_adj_all == "all" ? Inf : 0.003)
     sos_problem, P = LowCohomologySOS.sos_problem(
         laplacian,
         I_N,
         w_dec_matrix,
-        0.003
+        upper_bound
     )
     JuMP.set_optimizer(sos_problem, SP_4_Cohomology.scs_opt(eps = 1e-6, max_iters = 200_000))
     JuMP.optimize!(sos_problem)

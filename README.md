@@ -35,25 +35,24 @@ Note that this step needs to be executed only once per installation.
 
 ## Running actual replication
 
-### Steinberg presentations of $\text{Sp}_4(\mathbb{Z})$ and $\text{Sp}_6(\mathbb{Z})$
-We wish to prove that for the Steinberg presentations of $\text{Sp}_4(\mathbb{Z})$ and $\text{Sp}_6(\mathbb{Z})$ on $8$ and $18$ generators respectively (as defined in TO FILL SECTION [TO FILL](TO FILL))
-$\Delta_1-\lambda I_{12}$ and $\Delta_1-\lambda I_{18}$ is a sum of squares for $\lambda=0.0833$ and $\lambda=0.0302$ respectively. We provide also another version of calculations for Steinberg presentations, including some additional redundant relations. Even though the additional relations are redundant (i.e. the group remains unchanged) this leads to better estimates for the spectral gaps: $\lambda=0.1432$ for $\text{Sp}_4(\mathbb{Z})$ and $\lambda=0.0483$ for $\text{Sp}_6(\mathbb{Z})$.
+Our scripts perform the necessary optimizations to find such sums of squares decomposition. In all the execution commands below, there is a possibility to calculate the desired sum of squares decomposition from the already precomputed solution which shall substantially reduce the execution time (we skip in these cases solving the semi-definite optimization problem and focus on the *certification* procedure only, see ODN DO ARTK). In order to compute everything from scratch, set the `precomputed` flag to `false`. In the case you wish to use the precomputed solutions, set `precomputed` to `true`.
 
-Our scripts perform the necessary optimizations to find such sums of squares decomposition.
+### $\Delta_1-\lambda I$ is a sum of squares for $\text{Sp}_4(\mathbb{Z})$ and $\text{Sp}_6(\mathbb{Z})$
+We wish to prove that for the Steinberg presentations of $\text{Sp}_4(\mathbb{Z})$ and $\text{Sp}_6(\mathbb{Z})$ on $8$ and $18$ generators respectively (as defined in TO FILL SECTION [TO FILL](TO FILL))
+$\Delta_1-\lambda I_{12}$ and $\Delta_1-\lambda I_{18}$ is a sum of squares for $\lambda=0.0833$ and $\lambda=0.0302$ respectively.
 
 The following command needs to be executed in the terminal in `SP_4_Cohomology` folder:
 ```bash
-julia --project=. ./scripts/SP_2N_Steinberg.jl n redundancy_flag
+julia --project=. ./scripts/SP_2N_Steinberg.jl n precomputed
 ```
-for running the whole replication script for $\text{Sp}_{2n}(\mathbb{Z})$ for $n=2$ and $n=3$ and the `redundancy_flag` equal to `true` or `false` regarding our choice to include the redundant relations.
 
-The running time of the script will be approximately `25` minutes and `115` hours on a standard laptop computer for the cases $n=2$ and $n=3$ respectively. Therefore, in the latter case, we encourage to use the precomputed solution, focusing on the part providing the rigorous proof only.
-
-To run the script which uses the precomputed solution for $\text{Sp}_6(\mathbb{Z})$ (stored in the file "Steinberg_Solution_Sp_6.sjl", where $n=2,3$) and provides rigorous proof (certification) of the result, the following command needs to be executed in the terminal in `SP_4_Cohomology` folder:
-```bash
-julia --project=. ./scripts/SP_6_replication_precomputed/SP_6_Steinberg_precomputed.jl redundancy_flag
-```
-The running time of the above script will be approximately `70` minutes on a standard laptop computer.
+The running time of the script will be approximately `25` minutes and `115` hours on a standard laptop computer for the cases $n=2$ and $n=3$ respectively. Therefore, in the latter case, we encourage to use the precomputed solution, focusing on the part providing the rigorous proof only - the running time in such a case will be approximately `70` minutes on a standard laptop computer.
 
 ### $\Delta_1-\lambda I$ is a sum of squares for $\text{Sp}_{2n}(\mathbb{Z})/[Z_i,Z_i^T]$
-This is the part responsible for the proof for the lower bound of the spectral gap of $\Delta_1$ for $\text{Sp}_{2n}(\mathbb{Z})/[Z_i,Z_i^T]$. The key idea is to use the induction technique and reduce the proof to two concrete calculations for $\text{Sp}_{6}(\mathbb{Z})/[Z_i,Z_i^T]$. More precisely, one distinguishes two particular summands of $\Delta_1^-$, denoted by $\text{Sq}^-$ and $\text{Adj}^-$. The two calculations mentioned before are then providing lower bounds for $\lambda$ in expressions $\text{Sq}^-+\Delta_1^+-\lambda I$ and $\text{Adj}^-+\Delta_1^+-\lambda I$. The latter is much more important since it is responsible for the proof for all $n$ starting from a particular one, which can be set to $3$ by the first calculation. The details can be found in our article. Below, we provide instructions to replicate the aforementioned lower bounds.
+This is the part responsible for the proof for the lower bound of the spectral gap of $\Delta_1$ for $\text{Sp}_{2n}(\mathbb{Z})/[Z_i,Z_i^T]$. The key idea is to use the induction technique and reduce the proof to two concrete calculations for $\text{Sp}_{6}(\mathbb{Z})/[Z_i,Z_i^T]$. More precisely, one distinguishes two particular summands of $\Delta_1^-$, denoted by $\text{Sq}^-$ and $\text{Adj}^-$. The two calculations mentioned before are then providing lower bounds for $\lambda$ in expressions $\text{Sq}^-+\Delta_1^+-\lambda I$ and $\text{Adj}^-+\Delta_1^+-\lambda I$. The latter is much more important since it is responsible for the proof for all $n$ starting from a particular one, which can be set to $3$ by the first calculation. The details can be found in our article. 
+
+In order to replicate the computations, run in the terminal in `SP_4_Cohomology` folder: 
+```bash
+julia --project=. ./scripts/SP_2N_Steinberg.jl n sq_adj precomputed
+```
+The `sq_adj` flag corresponds to $\text{Sq}^-+\Delta_1^+-\lambda I$ and $\text{Adj}^-+\Delta_1^+-\lambda I$ respectively. Two corresponding options for this flag are: `"sq"` and `"adj"`. If one launches the replication from precomputed solution, the running times shall be approcimately `??` and `??` minutes respectively. In the case one wish to run the whole semi-definite optimization, it will be about `??` and `??` hours respecively.
