@@ -46,7 +46,7 @@ function relations_St(
         [com(x(i,j),x(j,k))*x(i,k)^(-1) for (i,j,k) in triples],
         [com(x(i,j),y(j,k))*y(i,k)^(-1) for (i,j,k) in triples],
         [com(x(i,j),yt(i,k))*yt(j,k) for (i,j,k) in triples],
-        [com(y(i,j),yt(j,k))*xt(i,k)^(-1) for (i,j,k) in triples]
+        [com(y(i,j),yt(j,k))*x(i,k)^(-1) for (i,j,k) in triples]
     )
     
     lift = Dict(S[i] => gens(F_G, i) for i in eachindex(S))
