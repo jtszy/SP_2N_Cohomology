@@ -39,7 +39,7 @@ Our scripts perform the necessary optimizations to find such sums of squares dec
 
 ### $\Delta_1-\lambda I$ is a sum of squares for $\text{Sp}_4(\mathbb{Z})$ and $\text{Sp}_6(\mathbb{Z})$
 We wish to prove that for the Steinberg presentations of $\text{Sp}_4(\mathbb{Z})$ and $\text{Sp}_6(\mathbb{Z})$ on $8$ and $18$ generators respectively (as defined in TO FILL SECTION [TO FILL](TO FILL))
-$\Delta_1-\lambda I_{12}$ and $\Delta_1-\lambda I_{18}$ is a sum of squares for $\lambda=0.0833$ and $\lambda=0.0302$ respectively.
+$\Delta_1-\lambda I_{8}$ and $\Delta_1-\lambda I_{18}$ is a sum of squares for $\lambda=0.82$ and $\lambda=??$ respectively.
 
 The following command needs to be executed in the terminal in `SP_2N_Cohomology` folder:
 ```bash
