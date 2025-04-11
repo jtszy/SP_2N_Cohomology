@@ -114,5 +114,5 @@ end
 # Turn into a rigorous proof - certify the numerical estimate
 certified_flag, certified_interval = SP_4_Cohomology.certify_sos_decomposition(laplacian, I_N, λ, Q, min_support)
 if certified_flag == true
-    @info "Spectral gap fits within the interval:" certified_spectral_interval
+    @info "Spectral gap fits within the interval:" certified_interval
 end
