@@ -64,7 +64,7 @@ elseif sq_adj_all == "sq"
     descr = "_H_"*string(N)*"_sq.sjl"
 else
     laplacian = Δ₁
-    descr = "_Sp_2"*string(N)*"_delta_1.sjl"
+    descr = "_Sp_"*string(2*N)*"_delta_1.sjl"
 end
 RG = LowCohomologySOS.group_ring(Sp_2N, min_support, star_multiplication = true)
 laplacian = LowCohomologySOS.embed.(identity, laplacian, Ref(RG))
