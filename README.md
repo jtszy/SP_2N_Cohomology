@@ -21,7 +21,7 @@ git clone https://github.com/jtszy/SP_4_Cohomology.git
 ```
 
 ## Setting up the environment
-First, run julia in the terminal in `SP_4_Cohomology` folder
+First, run julia in the terminal in `SP_2N_Cohomology` folder
 ```bash
 julia --project=.
 ```
