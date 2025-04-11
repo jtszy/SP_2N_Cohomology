@@ -43,7 +43,7 @@ $\Delta_1-\lambda I_{12}$ and $\Delta_1-\lambda I_{18}$ is a sum of squares for 
 
 The following command needs to be executed in the terminal in `SP_4_Cohomology` folder:
 ```bash
-julia --project=. ./scripts/SP_2N_Steinberg.jl n precomputed
+julia --project=. ./scripts/SP_2N_Steinberg.jl n precomputed all
 ```
 
 The running time of the script will be approximately `25` minutes and `115` hours on a standard laptop computer for the cases $n=2$ and $n=3$ respectively. Therefore, in the latter case, we encourage to use the precomputed solution, focusing on the part providing the rigorous proof only - the running time in such a case will be approximately `70` minutes on a standard laptop computer.
@@ -53,6 +53,6 @@ This is the part responsible for the proof for the lower bound of the spectral g
 
 In order to replicate the computations, run in the terminal in `SP_4_Cohomology` folder: 
 ```bash
-julia --project=. ./scripts/SP_2N_Steinberg.jl n sq_adj precomputed
+julia --project=. ./scripts/SP_2N_Steinberg.jl n precomputed delta_1
 ```
 The `sq_adj` flag corresponds to $\text{Sq}^-+\Delta_1^+-\lambda I$ and $\text{Adj}^-+\Delta_1^+-\lambda I$ respectively. Two corresponding options for this flag are: `"sq"` and `"adj"`. If one launches the replication from precomputed solution, the running times shall be approcimately `??` and `??` minutes respectively. In the case one wish to run the whole semi-definite optimization, it will be about `??` and `??` hours respecively.

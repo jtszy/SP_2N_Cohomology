@@ -16,12 +16,12 @@ using SymbolicWedderburn
 
 
 # Load the paremeters
-# N - parse(Integer, ARGS[1])
-# sq_adj = parse(String, ARGS[2])
-# precomputed = parse(String, ARGS[3])
-N = 3
-sq_adj_all = (sq_adj != "" ? sq_adj : "all")
-precomputed = false
+N - parse(Integer, ARGS[1])
+precomputed = parse(Bool, ARGS[2])
+sq_adj_all = parse(String, ARGS[3])
+# N = 3
+# precomputed = false
+# quotient_flag = true
 
 # Define Sp₂ₙ(Z) and the quotient homomorphism on it from the free group on Sp₂ₙ(Z)'s gens
 Sp_2N = MatrixGroups.SymplecticGroup{2*N}(Int8)
@@ -36,10 +36,12 @@ for i in eachindex(S)
 end
 
 # Compute the relations as words in the free group on gens of Sp₂ₙ(Z)
+quotient_flag = (sq_adj_all == "all" ? false : true)
 Steinberg_relations = SP_4_Cohomology.relations_St(
     F_Sp_2N_Steinberg, 
     S, 
-    N
+    N,
+    quotient_flag = quotient_flag
 )
 
 # Compute the Laplacian of interest
@@ -56,13 +58,13 @@ support_jacobian, min_support = SP_4_Cohomology.symplectic_min_supports(
 Δm_mono, Δm_sq, Δm_adj, Δm_op  = SP_4_Cohomology.mono_sq_adj_op(Δ₁⁻, S)
 if sq_adj_all == "adj"
     laplacian = Δm_adj + Δ₁⁺
-    descr = "_Sp_"*string(N)*"_adj.sjl"
+    descr = "_H_"*string(N)*"_adj.sjl"
 elseif sq_adj_all == "sq"
     laplacian = Δm_sq + Δ₁⁺
-    descr = "_Sp_"*string(N)*"_sq.sjl"
+    descr = "_H_"*string(N)*"_sq.sjl"
 else
     laplacian = Δ₁
-    descr = "_Sp_"*string(N)*"_delta_1.sjl"
+    descr = "_Sp_2"*string(N)*"_delta_1.sjl"
 end
 RG = LowCohomologySOS.group_ring(Sp_2N, min_support, star_multiplication = true)
 laplacian = LowCohomologySOS.embed.(identity, laplacian, Ref(RG))
@@ -89,12 +91,12 @@ if !precomputed
     )
 
     # Define and solve the corresponding SDP problem
-    upper_bound = (sq_adj_all == "all" ? Inf : 0.003)
+    # upper_bound = (sq_adj_all == "all" ? Inf : 0.003)
     sos_problem, P = LowCohomologySOS.sos_problem(
         laplacian,
         I_N,
         w_dec_matrix,
-        upper_bound
+        # upper_bound
     )
     JuMP.set_optimizer(sos_problem, SP_4_Cohomology.scs_opt(eps = 1e-6, max_iters = 200_000))
     JuMP.optimize!(sos_problem)
