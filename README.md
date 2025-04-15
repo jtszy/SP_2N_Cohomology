@@ -25,7 +25,7 @@ First, run julia in the terminal in `SP_2N_Cohomology` folder
 ```bash
 julia --project=.
 ```
-Next, to set up the proper environment for the replication run in julia REPL
+Next, to set up the proper environment for the replication run in Julia REPL
 ```julia
 julia> using Pkg; Pkg.instantiate()
 ```
@@ -39,7 +39,7 @@ Our scripts perform the necessary optimizations to find such sums of squares dec
 
 ### $\Delta_1-\lambda I$ is a sum of squares for $\text{Sp}_4(\mathbb{Z})$ and $\text{Sp}_6(\mathbb{Z})$
 We wish to prove that for the Steinberg presentations of $\text{Sp}_4(\mathbb{Z})$ and $\text{Sp}_6(\mathbb{Z})$ on $8$ and $18$ generators respectively (as defined in TO FILL SECTION [TO FILL](TO FILL))
-$\Delta_1-\lambda I_{8}$ and $\Delta_1-\lambda I_{18}$ is a sum of squares for $\lambda=0.82$ and $\lambda=??$ respectively.
+$\Delta_1-\lambda I_{8}$ and $\Delta_1-\lambda I_{18}$ is a sum of squares for $\lambda=0.82$ and $\lambda=0.99$ respectively.
 
 The following command needs to be executed in the terminal in `SP_2N_Cohomology` folder:
 ```bash
@@ -49,10 +49,10 @@ julia --project=. ./scripts/Sp_2n_Steinberg.jl n precomputed delta_1
 The running time of the script will be approximately `25` minutes and `115` hours on a standard laptop computer for the cases $n=2$ and $n=3$ respectively. Therefore, in the latter case, we encourage to use the precomputed solution, focusing on the part providing the rigorous proof only - the running time in such a case will be approximately `70` minutes on a standard laptop computer.
 
 ### $\Delta_1-\lambda I$ is a sum of squares for $\text{Sp}_{2n}(\mathbb{Z})/[Z_i,Z_i^T]$
-This is the part responsible for the proof for the lower bound of the spectral gap of $\Delta_1$ for $\text{Sp}_{2n}(\mathbb{Z})/[Z_i,Z_i^T]$. The key idea is to use the induction technique and reduce the proof to two concrete calculations for $\text{Sp}_{6}(\mathbb{Z})/[Z_i,Z_i^T]$. More precisely, one distinguishes two particular summands of $\Delta_1^-$, denoted by $\text{Sq}^-$ and $\text{Adj}^-$. The two calculations mentioned before are then providing lower bounds for $\lambda$ in expressions $\text{Sq}^-+\Delta_1^+-\lambda I$ and $\text{Adj}^-+\Delta_1^+-\lambda I$. The latter is much more important since it is responsible for the proof for all $n$ starting from a particular one, which can be set to $3$ by the first calculation. The details can be found in our article. 
+This is the part responsible for the proof for the lower bound of the spectral gap of $\Delta_1$ for $\text{Sp}_{2n}(\mathbb{Z})/[Z_i,Z_i^T]$. The key idea is to use the induction technique and reduce the proof to two concrete calculations for $\text{Sp}_{6}(\mathbb{Z})/[Z_i,Z_i^T]$. More precisely, one distinguishes two particular summands of $\Delta_1^-$, denoted by $\text{Sq}^-$ and $\text{Adj}^-$. The two calculations mentioned before are then providing lower bounds for $\lambda$ in expressions $\text{Sq}^-+\Delta_1^+-\lambda I$ and $\text{Adj}^-+\Delta_1^+-\lambda I$, the lower bounds being $0.99$ and $0.24$ respectively. The latter is much more important since it is responsible for the proof for all $n$ starting from a particular one, which can be set to $3$ by the first calculation. The details can be found in our article. 
 
 In order to replicate the computations, run in the terminal in `SP_2N_Cohomology` folder: 
 ```bash
 julia --project=. ./scripts/Sp_2n_Steinberg.jl n precomputed sq_adj
 ```
-The `sq_adj` flag corresponds to $\text{Sq}^-+\Delta_1^+-\lambda I$ and $\text{Adj}^-+\Delta_1^+-\lambda I$ respectively. Two corresponding options for this flag are: `"sq"` and `"adj"`. If one launches the replication from precomputed solution, the running times shall be approcimately `??` and `??` minutes respectively. In the case one wish to run the whole semi-definite optimization, it will be about `??` and `??` hours respecively.
+The `sq_adj` flag corresponds to $\text{Sq}^-+\Delta_1^+-\lambda I$ and $\text{Adj}^-+\Delta_1^+-\lambda I$ respectively. Two corresponding options for this flag are: `"sq"` and `"adj"`. If one launches the replication from precomputed solution, the running times shall be approximately `2` hours. In the case one wish to run the whole semi-definite optimization, it will be about `3` hours.

@@ -91,12 +91,18 @@ if !precomputed
     )
 
     # Define and solve the corresponding SDP problem
-    # upper_bound = (sq_adj_all == "all" ? Inf : 0.003)
+    if N == 2
+        upper_bound_ = Inf
+    elseif sq_adj_all != "adj"
+        upper_bound_ = 1.0
+    else
+        upper_bound_ = 0.25
+    end
     sos_problem, P = LowCohomologySOS.sos_problem(
         laplacian,
         I_N,
         w_dec_matrix,
-        # upper_bound
+        upper_bound_
     )
     JuMP.set_optimizer(sos_problem, SP_4_Cohomology.scs_opt(eps = 1e-6, max_iters = 200_000))
     JuMP.optimize!(sos_problem)
