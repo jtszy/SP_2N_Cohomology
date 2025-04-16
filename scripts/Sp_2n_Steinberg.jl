@@ -16,12 +16,9 @@ using SymbolicWedderburn
 
 
 # Load the paremeters
-N - parse(Integer, ARGS[1])
+N = parse(Int64, ARGS[1])
 precomputed = parse(Bool, ARGS[2])
-sq_adj_all = parse(String, ARGS[3])
-# N = 3
-# precomputed = false
-# quotient_flag = true
+sq_adj_all = ARGS[3]
 
 # Define Sp₂ₙ(Z) and the quotient homomorphism on it from the free group on Sp₂ₙ(Z)'s gens
 Sp_2N = MatrixGroups.SymplecticGroup{2*N}(Int8)

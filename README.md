@@ -35,10 +35,12 @@ Note that this step needs to be executed only once per installation.
 
 ## Running actual replication
 
-Our scripts perform the necessary optimizations to find such sums of squares decomposition. In all the execution commands below, there is a possibility to calculate the desired sum of squares decomposition from the already precomputed solution which shall substantially reduce the execution time (we skip in these cases solving the semi-definite optimization problem and focus on the *certification* procedure only, see ODN DO ARTK). In order to compute everything from scratch, set the `precomputed` flag to `false`. In the case you wish to use the precomputed solutions, set `precomputed` to `true`.
+Our scripts perform the necessary optimizations to find such sums of squares decomposition. In all the execution commands below, there is a possibility to calculate the desired sum of squares decomposition from the already precomputed solution which shall substantially reduce the execution time (we skip in these cases solving the semi-definite optimization problem and focus on the *certification* procedure only, see Appendix B in our paper). In the case you choose using the precomputed solution, it is necessary to download them from [Zenodo](TO FILL) since we have not uploaded them on GitHub due to its memory constraints. 
+
+In order to compute everything from scratch, set the `precomputed` flag to `false`. In the case you wish to use the precomputed solutions, set `precomputed` to `true`.
 
 ### $\Delta_1-\lambda I$ is a sum of squares for $\text{Sp}_4(\mathbb{Z})$ and $\text{Sp}_6(\mathbb{Z})$
-We wish to prove that for the Steinberg presentations of $\text{Sp}_4(\mathbb{Z})$ and $\text{Sp}_6(\mathbb{Z})$ on $8$ and $18$ generators respectively (as defined in TO FILL SECTION [TO FILL](TO FILL))
+We wish to prove that for the Steinberg presentations of $\text{Sp}_4(\mathbb{Z})$ and $\text{Sp}_6(\mathbb{Z})$ on $8$ and $18$ generators respectively (as defined in section 2 of our paper)
 $\Delta_1-\lambda I_{8}$ and $\Delta_1-\lambda I_{18}$ is a sum of squares for $\lambda=0.82$ and $\lambda=0.99$ respectively.
 
 The following command needs to be executed in the terminal in `SP_2N_Cohomology` folder:
