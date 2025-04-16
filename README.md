@@ -17,7 +17,7 @@ juliaup add 1.11.2
 ## Obtaining code
 To obtain the code for the replication, you can either download it directly from [Zenodo](TO FILL), or use git for this. In the latter case, first clone this repository via
 ```bash
-git clone https://github.com/jtszy/SP_4_Cohomology.git
+git clone https://github.com/jtszy/SP_2N_Cohomology.git
 ```
 
 ## Setting up the environment

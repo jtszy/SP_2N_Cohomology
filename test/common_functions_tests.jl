@@ -4,23 +4,23 @@
     Z2 = Groups.FPGroup(F_2, [a * b => b * a])
     A, B = Groups.gens(Z2)
 
-    @test SP_4_Cohomology.com(A, B) == one(Z2)
+    @test SP_2N_Cohomology.com(A, B) == one(Z2)
 
     sl_3 = MatrixGroups.SpecialLinearGroup{3}(Int8)
     e12, e13, e21, e23, e31, e32 = Groups.gens(sl_3)
 
-    @test SP_4_Cohomology.com(e12, e13) == one(sl_3)
-    @test SP_4_Cohomology.com(e12, e32) == one(sl_3)
-    @test SP_4_Cohomology.com(e13, e23) == one(sl_3)
-    @test SP_4_Cohomology.com(e21, e23) == one(sl_3)
-    @test SP_4_Cohomology.com(e21, e31) == one(sl_3)
-    @test SP_4_Cohomology.com(e31, e32) == one(sl_3)
-    @test SP_4_Cohomology.com(e12, e23) == e13
-    @test SP_4_Cohomology.com(e13, e32) == e12
-    @test SP_4_Cohomology.com(e21, e13) == e23
-    @test SP_4_Cohomology.com(e23, e31) == e21
-    @test SP_4_Cohomology.com(e31, e12) == e32
-    @test SP_4_Cohomology.com(e32, e21) == e31
+    @test SP_2N_Cohomology.com(e12, e13) == one(sl_3)
+    @test SP_2N_Cohomology.com(e12, e32) == one(sl_3)
+    @test SP_2N_Cohomology.com(e13, e23) == one(sl_3)
+    @test SP_2N_Cohomology.com(e21, e23) == one(sl_3)
+    @test SP_2N_Cohomology.com(e21, e31) == one(sl_3)
+    @test SP_2N_Cohomology.com(e31, e32) == one(sl_3)
+    @test SP_2N_Cohomology.com(e12, e23) == e13
+    @test SP_2N_Cohomology.com(e13, e32) == e12
+    @test SP_2N_Cohomology.com(e21, e13) == e23
+    @test SP_2N_Cohomology.com(e23, e31) == e21
+    @test SP_2N_Cohomology.com(e31, e12) == e32
+    @test SP_2N_Cohomology.com(e32, e21) == e31
 end
 
 @testset "quotient_homomorphism" begin
@@ -33,7 +33,7 @@ end
     test_group[a] = A
     test_group[b] = B
 
-    hom_Z2 = SP_4_Cohomology.quotient_homomorphism(F_2, Z2, test_group)
+    hom_Z2 = SP_2N_Cohomology.quotient_homomorphism(F_2, Z2, test_group)
 
     @test hom_Z2(a) == A
     @test hom_Z2(b) == B
@@ -62,7 +62,7 @@ end
         Groups.Homomorphism((i, F, G) -> Groups.word_type(G)([i]), source, target)
     end
 
-    support_jacobian, min_support = SP_4_Cohomology.symplectic_min_supports(selected_relations, quotient_hom_Steinberg, S)
+    support_jacobian, min_support = SP_2N_Cohomology.symplectic_min_supports(selected_relations, quotient_hom_Steinberg, S)
 
     gen_dict_2 = Dict(LowCohomologySOS.determine_letter(s) => s for s in S)
     X(i,j) = gen_dict_2[MatrixGroups.ElementarySymplectic{4}(:A,i,j)]

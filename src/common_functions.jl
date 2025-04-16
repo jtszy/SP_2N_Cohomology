@@ -100,8 +100,8 @@ function symplectic_min_supports(
     quotient_hom,
     S
 )   
-    sup_jacobian = SP_4_Cohomology.support_jacobian(vcat(relations, S), quotient_hom)
-    min_support = SP_4_Cohomology.minimalistic_support(relations, quotient_hom)
+    sup_jacobian = SP_2N_Cohomology.support_jacobian(vcat(relations, S), quotient_hom)
+    min_support = SP_2N_Cohomology.minimalistic_support(relations, quotient_hom)
 
     return sup_jacobian, min_support
 end

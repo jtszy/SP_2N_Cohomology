@@ -1,4 +1,4 @@
-module SP_4_Cohomology
+module SP_2N_Cohomology
 
 using Groups
 using IntervalArithmetic

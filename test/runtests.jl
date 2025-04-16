@@ -1,5 +1,6 @@
 using Groups
-using SP_4_Cohomology
+using LowCohomologySOS
+using SP_2N_Cohomology
 using Test
 
 include("common_functions_tests.jl")

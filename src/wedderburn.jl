@@ -85,7 +85,7 @@ function wedderburn_data(basis, half_basis, S)
         actions = LowCohomologySOS.WedderburnActions(
             alphabet(parent(first(S))), 
             Σ, 
-            SP_4_Cohomology.conjugation, 
+            SP_2N_Cohomology.conjugation, 
             S, 
             basis
         )

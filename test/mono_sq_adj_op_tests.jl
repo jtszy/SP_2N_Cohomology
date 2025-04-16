@@ -4,7 +4,7 @@
     F_Sp_2N_Steinberg = FreeGroup(alphabet(Sp_2N))
     S = gens(Sp_2N)
 
-    Steinberg_relations = SP_4_Cohomology.relations_St(
+    Steinberg_relations = SP_2N_Cohomology.relations_St(
         F_Sp_2N_Steinberg, 
         S, 
         N
@@ -12,7 +12,7 @@
     quotient_hom_Steinberg = let source = F_Sp_2N_Steinberg, target = Sp_2N
         Groups.Homomorphism((i, F, G) -> Groups.word_type(G)([i]), source, target)
     end
-    support_jacobian, min_support = SP_4_Cohomology.symplectic_min_supports(
+    support_jacobian, min_support = SP_2N_Cohomology.symplectic_min_supports(
         Steinberg_relations, 
         quotient_hom_Steinberg, 
         S
@@ -39,7 +39,7 @@
     Z(i) = gen_dict_2[MatrixGroups.ElementarySymplectic{2*N}(:B,i,i + N)]
     Zt(i) = gen_dict_2[MatrixGroups.ElementarySymplectic{2*N}(:B,i + N,i)]
 
-   mono, sq, adj, op = SP_4_Cohomology.mono_sq_adj_op(Δ₁⁻, S)
+   mono, sq, adj, op = SP_2N_Cohomology.mono_sq_adj_op(Δ₁⁻, S)
 
    for i in 1:20
         i1, j1 = rand(1:N), rand(1:N)

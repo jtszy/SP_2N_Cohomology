@@ -10,7 +10,7 @@ using LowCohomologySOS
 using PermutationGroups
 using SCS
 using Serialization
-using SP_4_Cohomology
+using SP_2N_Cohomology
 using SparseArrays
 using SymbolicWedderburn
 
@@ -37,7 +37,7 @@ end
 
 # Compute the relations as words in the free group on gens of Sp₂ₙ(Z)
 quotient_flag = (sq_adj_all == "all" ? false : true)
-Steinberg_relations = SP_4_Cohomology.relations_St(
+Steinberg_relations = SP_2N_Cohomology.relations_St(
     F_Sp_2N_Steinberg, 
     S, 
     N,
@@ -45,7 +45,7 @@ Steinberg_relations = SP_4_Cohomology.relations_St(
 )
 
 # Compute the Laplacian of interest
-support_jacobian, min_support = SP_4_Cohomology.symplectic_min_supports(
+support_jacobian, min_support = SP_2N_Cohomology.symplectic_min_supports(
     Steinberg_relations, 
     quotient_hom_Steinberg, 
     S
@@ -55,7 +55,7 @@ support_jacobian, min_support = SP_4_Cohomology.symplectic_min_supports(
     Steinberg_relations, 
     support_jacobian
 );
-Δm_mono, Δm_sq, Δm_adj, Δm_op  = SP_4_Cohomology.mono_sq_adj_op(Δ₁⁻, S)
+Δm_mono, Δm_sq, Δm_adj, Δm_op  = SP_2N_Cohomology.mono_sq_adj_op(Δ₁⁻, S)
 if sq_adj_all == "adj"
     laplacian = Δm_adj + Δ₁⁺
     descr = "_H_"*string(N)*"_adj.sjl"
@@ -73,7 +73,7 @@ I_N = LowCohomologySOS.embed.(identity, I_N_whole, Ref(RG))
 # Either compute or load the numerical solution of the corresponding SDP
 if !precomputed
     # Wedderburn symmetrization
-    constraints_basis, psd_basis, Σ, action = SP_4_Cohomology.wedderburn_data(
+    constraints_basis, psd_basis, Σ, action = SP_2N_Cohomology.wedderburn_data(
         RG.basis, 
         min_support, 
         S
@@ -104,7 +104,7 @@ if !precomputed
         w_dec_matrix,
         upper_bound_
     )
-    JuMP.set_optimizer(sos_problem, SP_4_Cohomology.scs_opt(eps = 1e-6, max_iters = 200_000))
+    JuMP.set_optimizer(sos_problem, SP_2N_Cohomology.scs_opt(eps = 1e-6, max_iters = 200_000))
     JuMP.optimize!(sos_problem)
     λ, Q = LowCohomologySOS.get_solution(sos_problem, P, w_dec_matrix)
 
@@ -118,7 +118,7 @@ else
 end
 
 # Turn into a rigorous proof - certify the numerical estimate
-certified_flag, certified_interval = SP_4_Cohomology.certify_sos_decomposition(laplacian, I_N, λ, Q, min_support)
+certified_flag, certified_interval = SP_2N_Cohomology.certify_sos_decomposition(laplacian, I_N, λ, Q, min_support)
 if certified_flag == true
     @info "Spectral gap fits within the interval:" certified_interval
 end
