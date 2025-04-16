@@ -15,7 +15,7 @@ juliaup add 1.11.2
 ```
 
 ## Obtaining code
-To obtain the code for the replication, you can either download it directly from [Zenodo](TO FILL), or use git for this. In the latter case, first clone this repository via
+To obtain the code for the replication, you can either download it directly from [Zenodo](https://zenodo.org/records/15225937), or use git for this. In the latter case, first clone this repository via
 ```bash
 git clone https://github.com/jtszy/SP_2N_Cohomology.git
 ```
@@ -35,7 +35,7 @@ Note that this step needs to be executed only once per installation.
 
 ## Running actual replication
 
-Our scripts perform the necessary optimizations to find such sums of squares decomposition. In all the execution commands below, there is a possibility to calculate the desired sum of squares decomposition from the already precomputed solution which shall substantially reduce the execution time (we skip in these cases solving the semi-definite optimization problem and focus on the *certification* procedure only, see Appendix B in our paper). In the case you choose using the precomputed solution, it is necessary to download them from [Zenodo](TO FILL) since we have not uploaded them on GitHub due to its memory constraints. 
+Our scripts perform the necessary optimizations to find such sums of squares decomposition. In all the execution commands below, there is a possibility to calculate the desired sum of squares decomposition from the already precomputed solution which shall substantially reduce the execution time (we skip in these cases solving the semi-definite optimization problem and focus on the *certification* procedure only, see Appendix B in our paper). In the case you choose using the precomputed solution, it is necessary to download them from [Zenodo](https://zenodo.org/records/15225937) since we have not uploaded them on GitHub due to its memory constraints. 
 
 In order to compute everything from scratch, set the `precomputed` flag to `false`. In the case you wish to use the precomputed solutions, set `precomputed` to `true`.
 
