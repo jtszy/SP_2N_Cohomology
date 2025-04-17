@@ -45,7 +45,7 @@ $\Delta_1-\lambda I_{8}$ and $\Delta_1-\lambda I_{18}$ is a sum of squares for $
 
 The following command needs to be executed in the terminal in `SP_2N_Cohomology` folder:
 ```bash
-julia --project=. ./scripts/Sp_2n_Steinberg.jl n precomputed delta_1
+julia --project=. ./scripts/Sp_2n_Steinberg.jl 3 precomputed delta_1
 ```
 
 The running time of the script will be approximately `25` minutes and `115` hours on a standard laptop computer for the cases $n=2$ and $n=3$ respectively. Therefore, in the latter case, we encourage to use the precomputed solution, focusing on the part providing the rigorous proof only - the running time in such a case will be approximately `70` minutes on a standard laptop computer.
