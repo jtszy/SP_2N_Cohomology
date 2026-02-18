@@ -62,9 +62,5 @@ function relations_St(
         end
     end
 
-    if N == 2 && quotient_flag == true
-        return vcat(relations_mono, relations_sq, commutator_relations)
-    else
-        return vcat(relations_mono, relations_sq, relations_adj, commutator_relations)
-    end
+    return vcat(relations_mono, relations_sq, relations_adj, commutator_relations)
 end
